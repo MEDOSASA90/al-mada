@@ -1,0 +1,27 @@
+{
+  "name": "al-mada",
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
+  "regions": ["iad1"],
+  "git": {
+    "deploymentEnabled": {
+      "main": true
+    }
+  },
+  "env": {
+    "NEXT_PUBLIC_SUPABASE_URL": "@nextjs_supabase_url",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "@nextjs_supabase_anon_key",
+    "SUPABASE_SERVICE_ROLE_KEY": "@nextjs_supabase_service_role_key",
+    "GROQ_API_KEY": "@nextjs_groq_api_key",
+    "TELEGRAM_BOT_TOKEN": "@nextjs_telegram_bot_token"
+  },
+  "functions": {
+    "api/**/*.ts": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  }
+}
