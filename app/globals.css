@@ -1,0 +1,13 @@
+@import 'tailwindcss';
+
+:root {
+  --font-cairo: 'Cairo', 'Noto Sans Arabic', 'Segoe UI', system-ui, -apple-system,
+    'Helvetica Neue', Arial, sans-serif;
+}
+
+html,
+body {
+  font-family: var(--font-cairo);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
