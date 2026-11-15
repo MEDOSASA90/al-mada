@@ -3,6 +3,19 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 export async function refreshSession(request: NextRequest) {
   let response = NextResponse.next({ request });
+
+  // 1. If demo role is selected, grant immediate access across all routes
+  const demoRole = request.cookies.get('almada_demo_role')?.value;
+  if (demoRole && ['clinic_owner', 'doctor', 'receptionist', 'accountant'].includes(demoRole)) {
+    if (request.nextUrl.pathname === '/login') {
+      const home = request.nextUrl.clone();
+      home.pathname = '/';
+      home.search = '';
+      return NextResponse.redirect(home);
+    }
+    return response;
+  }
+
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !key) return response;

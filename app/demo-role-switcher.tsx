@@ -1,17 +1,14 @@
 'use client';
 
-import { useTransition } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export function DemoRoleSwitcher({ currentRole }: { currentRole: string }) {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const [switching, setSwitching] = useState(false);
 
   function switchRole(role: string) {
+    setSwitching(true);
     document.cookie = `almada_demo_role=${role}; path=/; max-age=86400; SameSite=Lax`;
-    startTransition(() => {
-      router.refresh();
-    });
+    window.location.reload();
   }
 
   const roles = [
@@ -32,7 +29,7 @@ export function DemoRoleSwitcher({ currentRole }: { currentRole: string }) {
             <button
               key={r.id}
               type="button"
-              disabled={isPending || active}
+              disabled={switching || active}
               onClick={() => switchRole(r.id)}
               className={`rounded-lg px-2.5 py-1 text-xs font-bold transition shadow-2xs ${
                 active
@@ -46,7 +43,7 @@ export function DemoRoleSwitcher({ currentRole }: { currentRole: string }) {
           );
         })}
       </div>
-      {isPending && <span className="text-xs text-teal-700 animate-pulse">جارٍ التبديل…</span>}
+      {switching && <span className="text-xs text-teal-700 animate-pulse font-medium">جارٍ التبديل…</span>}
     </div>
   );
 }

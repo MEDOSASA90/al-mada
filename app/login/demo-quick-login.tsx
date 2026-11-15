@@ -1,18 +1,15 @@
 'use client';
 
-import { useTransition } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export function DemoQuickLogin() {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const [selectedRole, setSelectedRole] = useState<string | null>(null);
 
   function selectRoleAndEnter(role: string) {
+    setSelectedRole(role);
     document.cookie = `almada_demo_role=${role}; path=/; max-age=86400; SameSite=Lax`;
-    startTransition(() => {
-      router.push('/');
-      router.refresh();
-    });
+    // Hard redirect to ensure edge middleware receives cookie directly
+    window.location.href = '/';
   }
 
   const demoAccounts = [
@@ -45,23 +42,25 @@ export function DemoQuickLogin() {
         <p className="text-xs font-bold text-slate-700">
           🚀 الدخول الفوري بحسابات تجريبية (بدون كلمة مرور):
         </p>
-        {isPending && <span className="text-xs text-teal-700 animate-pulse font-medium">جارٍ الدخول…</span>}
+        {selectedRole && <span className="text-xs text-teal-700 animate-pulse font-medium">جارٍ فتح العيادة…</span>}
       </div>
       <div className="grid gap-2">
         {demoAccounts.map((acc) => (
           <button
             key={acc.role}
             type="button"
-            disabled={isPending}
+            disabled={Boolean(selectedRole)}
             onClick={() => selectRoleAndEnter(acc.role)}
-            className={`w-full text-right p-3 rounded-xl border text-xs transition flex items-center justify-between gap-3 shadow-2xs ${acc.color}`}
+            className={`w-full text-right p-3 rounded-xl border text-xs transition flex items-center justify-between gap-3 shadow-2xs ${acc.color} ${
+              selectedRole === acc.role ? 'ring-2 ring-teal-600' : ''
+            }`}
           >
             <div>
               <div className="font-bold text-sm text-slate-900">{acc.title}</div>
               <div className="text-slate-600 text-xs mt-0.5 leading-relaxed">{acc.subtitle}</div>
             </div>
             <span className="shrink-0 rounded-md bg-white/80 px-2 py-1 text-[11px] font-semibold shadow-2xs">
-              {acc.badge} ➔
+              {selectedRole === acc.role ? 'جارٍ الفتح…' : `${acc.badge} ➔`}
             </span>
           </button>
         ))}

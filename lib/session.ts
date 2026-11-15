@@ -15,12 +15,9 @@ export async function getCurrentSession(): Promise<CurrentSession | null> {
   const cookieStore = await cookies();
   const demoRoleCookie = cookieStore.get('almada_demo_role')?.value;
 
-  // Offline / Demo mode when Supabase is not configured
-  if (!url || !key) {
-    const role = demoRoleCookie && ['clinic_owner', 'doctor', 'receptionist', 'accountant'].includes(demoRoleCookie)
-      ? demoRoleCookie
-      : DEMO_USER.role;
-
+  // 1. Explicit Demo Role Cookie takes immediate precedence (works on Vercel and local)
+  if (demoRoleCookie && ['clinic_owner', 'doctor', 'receptionist', 'accountant'].includes(demoRoleCookie)) {
+    const role = demoRoleCookie;
     const email = role === 'receptionist'
       ? 'reception@almada.eg'
       : role === 'doctor'
@@ -37,6 +34,17 @@ export async function getCurrentSession(): Promise<CurrentSession | null> {
     };
   }
 
+  // 2. Offline / Demo mode when Supabase is not configured
+  if (!url || !key) {
+    return {
+      user: { id: DEMO_USER.id, email: DEMO_USER.email },
+      membership: { clinic_id: DEMO_CLINIC.id, role: DEMO_USER.role },
+      clinic: { id: DEMO_CLINIC.id, name: DEMO_CLINIC.name, name_ar: DEMO_CLINIC.name_ar },
+      isDemo: true,
+    };
+  }
+
+  // 3. Cloud Supabase authentication
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
