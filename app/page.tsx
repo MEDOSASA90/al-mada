@@ -84,10 +84,19 @@ export default async function Home() {
             {['clinic_owner', 'clinic_admin'].includes(membership.role) && (
               <>
                 <Link href="/settings/staff" className="secondary-button inline-flex items-center text-sm">
-                  👥 إدارة الطاقم
+                  👥 الطاقم
+                </Link>
+                <Link href="/settings/branches" className="secondary-button inline-flex items-center text-sm">
+                  🏢 الفروع
+                </Link>
+                <Link href="/settings/notifications" className="secondary-button inline-flex items-center text-sm">
+                  📲 الواتساب
+                </Link>
+                <Link href="/settings/subscription" className="secondary-button inline-flex items-center text-sm">
+                  ⭐ الاشتراك
                 </Link>
                 <Link href="/settings/export" className="secondary-button inline-flex items-center text-sm">
-                  📦 تصدير البيانات
+                  📦 تصدير
                 </Link>
                 <Link href="/settings/trash" className="secondary-button inline-flex items-center text-sm">
                   ♻️ المحذوفات
