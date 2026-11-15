@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getCurrentSession } from '@/lib/session';
-import { listClinicBranches } from '@/lib/branches';
+import { listClinicBranches, listDoctorShifts } from '@/lib/branches';
 import { BranchList } from './branch-list';
 
 export const dynamic = 'force-dynamic';
@@ -16,7 +16,10 @@ export default async function BranchesSettingsPage() {
     redirect('/');
   }
 
-  const branches = await listClinicBranches();
+  const [branches, shifts] = await Promise.all([
+    listClinicBranches(),
+    listDoctorShifts(),
+  ]);
 
   return (
     <main className="min-h-screen bg-slate-50 p-4 sm:p-8" dir="rtl">
@@ -28,11 +31,11 @@ export default async function BranchesSettingsPage() {
               <span>/</span>
               <Link href="/settings/staff" className="hover:text-teal-800">الإعدادات</Link>
               <span>/</span>
-              <span className="text-slate-900 font-medium">فروع العيادة</span>
+              <span className="text-slate-900 font-medium">فروع العيادة وشفتات الأطباء</span>
             </div>
-            <h1 className="text-2xl font-bold text-slate-900">إدارة فروع العيادة</h1>
+            <h1 className="text-2xl font-bold text-slate-900">إدارة فروع العيادة ومصفوفة شفتات الأطباء</h1>
             <p className="text-sm text-slate-500">
-              تسجيل وتوزيع الفروع الجغرافية، مواعيد العمل، وربط الكشوفات بالمواقع
+              توزيع الفروع جغرافياً، روابط Google Maps، خزائن ومخازن الفروع، وجداول عمل الأطباء
             </p>
           </div>
           <Link
@@ -43,7 +46,7 @@ export default async function BranchesSettingsPage() {
           </Link>
         </header>
 
-        <BranchList initialBranches={branches} />
+        <BranchList initialBranches={branches} initialShifts={shifts} />
       </div>
     </main>
   );

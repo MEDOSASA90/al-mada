@@ -18,17 +18,24 @@ export function WhatsAppTester({
 
   const activeTmpl = initialTemplates.find((t) => t.key === selectedTemplate) || initialTemplates[0];
 
+  function renderMessageText(template: NotificationTemplate) {
+    return template.content
+      .replace('{clinic_name}', 'عيادة المدى التخصصية')
+      .replace('{date}', 'اليوم')
+      .replace('{time}', '07:30 م')
+      .replace('{doctor_name}', 'د. سارة عثمان')
+      .replace('{branch_name}', 'الفرع الرئيسي - مصر الجديدة')
+      .replace('{maps_url}', 'https://maps.google.com/?q=Heliopolis+AlMada')
+      .replace('{queue_number}', '5')
+      .replace('{waiting_ahead}', '2')
+      .replace('{eta_minutes}', '20')
+      .replace('{portal_url}', 'https://al-mada-pink.vercel.app/portal');
+  }
+
   function handleSendTest() {
     startTransition(async () => {
       await new Promise((r) => setTimeout(r, 600));
-      const rendered = activeTmpl.content
-        .replace('{clinic_name}', 'عيادة المدى التخصصية')
-        .replace('{date}', 'اليوم')
-        .replace('{time}', '07:30 م')
-        .replace('{doctor_name}', 'د. سارة عثمان')
-        .replace('{queue_number}', '5')
-        .replace('{waiting_ahead}', '2')
-        .replace('{portal_url}', 'https://al-mada-pink.vercel.app/portal');
+      const rendered = renderMessageText(activeTmpl);
 
       const newMsg: OutboxMessage = {
         id: `msg_${Date.now()}`,
@@ -51,10 +58,10 @@ export function WhatsAppTester({
       {/* Privacy Guarantee Banner */}
       <div className="rounded-2xl border border-sky-200 bg-sky-50/70 p-5 text-sky-950 space-y-2">
         <div className="flex items-center gap-2 font-bold text-sm">
-          <span>🛡️ التزام صارم بخصوصية البيانات الطبية (قانون حماية البيانات المصري 151/2020):</span>
+          <span>🛡️ التزام صارم بخصوصية المريض (قانون حماية البيانات الشخصية المصري 151/2020):</span>
         </div>
         <p className="text-xs leading-relaxed text-sky-900">
-          تقتصر كافة رسائل الواتساب والرسائل النصية التلقائية على معلومات الحضور ومواعيد الطابور فقط. <strong>يحظر النظام تلقائياً إرسال أي تشخيص مرضي أو أسماء أدوية أو نتائج تحاليل سريرية عبر الواتساب</strong>، ويتم توجيه المريض حصراً للولوج الآمن عبر بوابة المريض المعتمدة.
+          تقتصر كافة رسائل الواتساب على معلومات الحضور، اللوكيشن، ومواعيد الطابور فقط. <strong>يحظر النظام تلقائياً إرسال أي تشخيص مرضي أو أسماء أدوية أو نتائج تحاليل سريرية عبر الواتساب</strong> منعاً لانتهاك الخصوصية في حال فتح شخص آخر لهاتف المريض، ويتم توجيه المريض حصراً للولوج الآمن عبر بوابة المريض المعتمدة.
         </p>
       </div>
 
@@ -64,7 +71,7 @@ export function WhatsAppTester({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">اختر قالب الرسالة:</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1">اختر قالب الرسالة الآلية:</label>
               <select
                 value={selectedTemplate}
                 onChange={(e) => setSelectedTemplate(e.target.value)}
@@ -106,21 +113,17 @@ export function WhatsAppTester({
             <div>
               <span className="text-[11px] font-bold text-emerald-900 block mb-2">معاينة الرسالة كما ستصل لهاتف المريض:</span>
               <div className="rounded-xl bg-white p-4 shadow-xs text-xs text-slate-800 leading-relaxed border border-emerald-100">
-                <p className="whitespace-pre-line">
-                  {activeTmpl.content
-                    .replace('{clinic_name}', 'عيادة المدى التخصصية')
-                    .replace('{date}', 'اليوم')
-                    .replace('{time}', '07:30 م')
-                    .replace('{doctor_name}', 'د. سارة عثمان')
-                    .replace('{queue_number}', '5')
-                    .replace('{waiting_ahead}', '2')
-                    .replace('{portal_url}', 'https://al-mada-pink.vercel.app/portal')}
+                <p className="whitespace-pre-line font-sans">
+                  {renderMessageText(activeTmpl)}
                 </p>
-                <div className="mt-2 text-left text-[10px] text-slate-400">07:30 م ✓✓</div>
+                <div className="mt-3 flex items-center justify-between text-[10px] text-slate-400 border-t border-slate-100 pt-2">
+                  <span>تم الإرسال عبر WhatsApp Cloud API</span>
+                  <span className="text-emerald-700 font-bold">07:30 م ✓✓</span>
+                </div>
               </div>
             </div>
-            <p className="text-[11px] text-slate-400 mt-3 text-center">
-              يتم استبدال المتغيرات تلقائياً من بيانات الموعد وطابور الكشف الحي
+            <p className="text-[11px] text-slate-500 mt-3 text-center">
+              يتم استبدال لوكيشن خرائط جوجل ووقت الانتظار التقريبي تلقائياً من بيانات الفرع المختار
             </p>
           </div>
         </div>

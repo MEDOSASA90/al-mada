@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getCurrentSession } from '@/lib/session';
-import { getClinicSubscription } from '@/lib/subscriptions';
+import { getClinicSubscription, getSubscriptionInvoices } from '@/lib/subscriptions';
 import { SubscriptionManager } from './subscription-manager';
 
 export const dynamic = 'force-dynamic';
@@ -16,7 +16,10 @@ export default async function SubscriptionPage() {
     redirect('/');
   }
 
-  const subscription = await getClinicSubscription();
+  const [subscription, invoices] = await Promise.all([
+    getClinicSubscription(),
+    getSubscriptionInvoices(),
+  ]);
 
   return (
     <main className="min-h-screen bg-slate-50 p-4 sm:p-8" dir="rtl">
@@ -28,11 +31,11 @@ export default async function SubscriptionPage() {
               <span>/</span>
               <Link href="/settings/staff" className="hover:text-teal-800">الإعدادات</Link>
               <span>/</span>
-              <span className="text-slate-900 font-medium">الاشتراك والباقات</span>
+              <span className="text-slate-900 font-medium">الاشتراك والفوترة</span>
             </div>
-            <h1 className="text-2xl font-bold text-slate-900">إدارة اشتراك العيادة والفوترة</h1>
+            <h1 className="text-2xl font-bold text-slate-900">إدارة اشتراك العيادة والفوترة المصرية</h1>
             <p className="text-sm text-slate-500">
-              متابعة السعة، الفروع، الأطباء، وتجديد باقة المنصة السحابية
+              الدفع بفوري والمحافظ الإلكترونية، السعة والحساب النسبي، وسجل الإيصالات الضريبية
             </p>
           </div>
           <Link
@@ -43,7 +46,7 @@ export default async function SubscriptionPage() {
           </Link>
         </header>
 
-        <SubscriptionManager subscription={subscription} />
+        <SubscriptionManager subscription={subscription} invoices={invoices} />
       </div>
     </main>
   );
