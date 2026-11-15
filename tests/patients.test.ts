@@ -6,6 +6,9 @@
  */
 import { listPatients, createPatient, softDeletePatient } from '@/lib/patients';
 
+process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://synthetic.supabase.co';
+process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'synthetic-key';
+
 const mockFrom = jest.fn();
 const mockSelect = jest.fn();
 const mockEq = jest.fn();
@@ -13,20 +16,17 @@ const mockIs = jest.fn();
 const mockOrder = jest.fn();
 const mockLimit = jest.fn();
 const mockOr = jest.fn();
-const mockInsert = jest.fn();
-const mockUpdate = jest.fn();
-const mockSingle = jest.fn();
+const mockRpc = jest.fn();
+const mockMaybeSingle = jest.fn();
 
-jest.mock('@/lib/supabase', () => ({
-  getBrowserClient: () => ({ from: mockFrom }),
+jest.mock('@/lib/supabase/server', () => ({
+  createClient: async () => ({ from: mockFrom, rpc: mockRpc }),
 }));
 
 beforeEach(() => {
   jest.clearAllMocks();
   mockFrom.mockReturnValue({
     select: mockSelect,
-    insert: mockInsert,
-    update: mockUpdate,
   });
   mockSelect.mockReturnValue({
     is: mockIs,
@@ -34,16 +34,15 @@ beforeEach(() => {
     order: mockOrder,
     limit: mockLimit,
     or: mockOr,
-    single: mockSingle,
+    maybeSingle: mockMaybeSingle,
   });
   mockIs.mockReturnValue({ or: mockOr, order: mockOrder });
   mockOr.mockReturnValue({ order: mockOrder });
   mockOrder.mockReturnValue({ limit: mockLimit });
   mockLimit.mockResolvedValue({ data: [], error: null });
-  mockInsert.mockReturnValue({ select: () => ({ single: mockSingle }) });
-  mockUpdate.mockReturnValue({ eq: mockEq });
-  mockEq.mockResolvedValue({ data: null, error: null });
-  mockSingle.mockResolvedValue({ data: null, error: null });
+  mockEq.mockReturnValue({ maybeSingle: mockMaybeSingle });
+  mockMaybeSingle.mockResolvedValue({ data: null, error: null });
+  mockRpc.mockResolvedValue({ data: 'p1', error: null });
 });
 
 describe('listPatients', () => {
@@ -81,30 +80,30 @@ describe('listPatients', () => {
 });
 
 describe('createPatient', () => {
-  it('sends the clinic_id so RLS can validate the tenant', async () => {
+  it('derives the clinic from the authenticated server session', async () => {
     const input = {
-      clinic_id: 'clinic-a',
       full_name: 'سارة',
       phone: '+201000000000',
     };
+    mockMaybeSingle.mockResolvedValue({ data: { id: 'p1', full_name: 'سارة' }, error: null });
     await createPatient(input);
-    const insertArg = mockInsert.mock.calls[0][0];
-    expect(insertArg.clinic_id).toBe('clinic-a');
-    expect(insertArg.full_name).toBe('سارة');
+    expect(mockRpc).toHaveBeenCalledWith('create_patient_for_current_user', expect.objectContaining({
+      p_full_name: 'سارة', p_phone: '+201000000000',
+    }));
+    expect(mockRpc.mock.calls[0][1]).not.toHaveProperty('clinic_id');
   });
 
-  it('surfaces insert errors', async () => {
-    mockSingle.mockResolvedValue({ data: null, error: { message: 'duplicate key' } });
+  it('surfaces RPC errors', async () => {
+    mockRpc.mockResolvedValue({ data: null, error: { message: 'duplicate key' } });
     await expect(
-      createPatient({ clinic_id: 'c', full_name: 'x', phone: 'y' }),
+      createPatient({ full_name: 'x', phone: 'y' }),
     ).rejects.toThrow(/duplicate key/);
   });
 });
 
 describe('softDeletePatient', () => {
-  it('sets deleted_at instead of hard-deleting', async () => {
+  it('uses the tenant-aware archive RPC', async () => {
     await softDeletePatient('p1');
-    const updateArg = mockUpdate.mock.calls[0][0];
-    expect(updateArg).toHaveProperty('deleted_at');
+    expect(mockRpc).toHaveBeenCalledWith('archive_patient_for_current_user', { p_id: 'p1' });
   });
 });

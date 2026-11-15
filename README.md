@@ -1,286 +1,55 @@
-# Al-Mada — منصة SaaS لإدارة العيادات والمراكز الطبية
+# Al-Mada
 
-> **المَدَى** — المسار المستقبلي للعيادات الطبية في مصر
+منصة عربية لإدارة العيادات الطبية في مصر، مبنية على Next.js وSupabase. المستودع في مرحلة تأسيس المنتج: المصادقة وإنشاء مساحة العيادة هما أول تدفق استخدام، ثم تُبنى وظائف التشغيل فوق صلاحيات قاعدة البيانات.
 
----
+## الموجود في المستودع
 
-## 🎯 نظرة عامة
+- تطبيق Next.js App Router بواجهة عربية RTL.
+- Supabase Auth باستخدام جلسات cookies من خلال `@supabase/ssr`.
+- مسارات تسجيل الدخول وإنشاء الحساب، وإعداد أول عيادة وفرع رئيسي.
+- ترحيلات PostgreSQL تضم 60 جدولًا للنواة التشغيلية، مع سياسات RLS. الترحيل `0007` يضيف إنشاء العيادة ويشدّد سياسات الأدوار.
+- بداية لعرض سجلات المرضى، واختبارات وحدات لمساعدات المرضى.
 
-**Al-Mada** هي منصة SaaS متكاملة لإدارة العيادات والمراكز الطبية في مصر، تجمع بين:
+لا تعتبر بيانات النشر أو الخدمات الخارجية الواردة في وثائق قديمة حالة مؤكدة. هذا المستودع وحده لا يثبت أن قاعدة سحابية أو n8n أو Vercel متاحة أو تعمل. استخدم بيانات اصطناعية فقط إلى أن تكتمل مراجعة الأمان والخصوصية ومكان استضافة البيانات.
 
-- 📱 **حجز مواعيد ذكي** — واتساب، ويب، تطبيق موبايل
-- 📄 **ملف مريض إلكتروني شامل** — تشخيص، روشتة، تحاليل
-- 💊 **روشتة ذكية بالصوت** — إملاء صوتي باللهجة المصرية
-- 🤖 **مساعد طبيب AI** — تلخيص، قراءة تقارير، تنبيهات دوائية
-- 📊 **تقارير مالية وتشغيلية** — صافي الربح، إشغال المواعيد
-- 🤝 **تكامل واتساب** — رسائل رسمية من Meta
-- 💳 **دفع متعدد** — Paymob, InstaPay, Fawry, Vodafone Cash
+## التشغيل المحلي
 
----
+1. ثبّت Node.js 22 أو أحدث وDocker، ثم شغّل `npm install`.
+2. شغّل `npx supabase start` لبدء بيئة Supabase المحلية.
+3. انسخ `.env.example` إلى `.env.local`، واستخدم عنوان ومفتاح `anon` اللذين يطبعها CLI.
+4. شغّل `npx supabase db reset` لتطبيق migrations وبيانات المنصة الوهمية على قاعدة التطوير المحلية.
+5. شغّل `npm run dev` وافتح `http://localhost:3000`.
 
-## 📊 الحالة الحالية (2026-11-04)
+يمكن إنشاء حساب من صفحة الدخول، ثم إنشاء عيادة من صفحة الإعداد الأولي. بيئة Supabase المحلية تستخدم بريدًا تجريبيًا؛ راجع مخرجات `npx supabase start` لبيانات الدخول إلى Inbucket. إعداد تأكيد البريد في مشروع مستضاف يجب ضبطه قبل النشر. لا تضع `service_role` أو أي مفتاح سري في متغيرات `NEXT_PUBLIC_*` أو في المستودع.
 
-| النظام | الحالة | الرابط |
-|--------|--------|--------|
-| **Frontend** | ✅ Deployed on Vercel | [al-mada-pink.vercel.app](https://al-mada-pink.vercel.app) |
-| **Backend** | ✅ Supabase (60 tables, RLS) | hhdligatjrxqopspghal (eu-central-1) |
-| **CI/CD** | ✅ GitHub Actions (all passing) | [al-mada Actions](https://github.com/MEDOSASA90/al-mada/actions) |
-| **n8n** | ✅ 6 active workflows | VPS (143.246.43.27) |
-| **Telegram Bot** | ✅ Al_Mada_Clinic_Bot | t.me/Al_Mada_Clinic_Bot |
-| **Monitoring** | ✅ Vercel Analytics + n8n health + Telegram alerts | — |
+## متغيرات البيئة
 
-### المرحلة الحالية: **Phase 1 — Foundation Complete** ✅
-
-- ✅ Next.js 15.5.29, TypeScript strict, Tailwind v4
-- ✅ CI/CD (lint, typecheck, build, test) — all jobs passing
-- ✅ GitHub Actions secrets (6/6) + Vercel env vars
-- ✅ Supabase schema (60 tables, RLS + FORCE, 231 policies)
-- ✅ n8n workflows (Telegram relay, daily appointments report)
-- ✅ Vercel deployment + GitHub-Vercel auto-deploy
-
-**الخطوة التالية:** Phase 2 — الهوية وعزل العيادات (تسجيل الدخول، نموذج العيادات، سياسات عزل البيانات).
-
----
-
-## 🏗️ البنية التقنية
-
-### الطبقات
-|| الطبقة | التقنية | الحالة |
-|--------|---------|--------|
-| **Frontend** | Next.js 15.5.29 (App Router) + TypeScript strict + Tailwind v4 | ✅ Deployed on Vercel |
-| **Backend** | Supabase (PostgreSQL + RLS + Realtime + Storage) — 60 tables, 231 policies | ✅ eu-central-1 (Frankfurt) |
-| **CI/CD** | GitHub Actions (lint, typecheck, build, test) + Vercel auto-deploy | ✅ All jobs passing |
-| **AI & Automation** | n8n (Self-Hosted) + Groq (GPT-4o-mini) | ✅ 6 active workflows |
-| **Messaging** | Telegram Bot (Al_Mada_Clinic_Bot) | ✅ Webhook relay active |
-| **Monitoring** | Vercel Analytics + n8n health + Telegram alerts | ✅ Setup complete |
-
-### قاعدة البيانات
-- 13+ جداول أساسية
-- Row-Level Security (RLS)
-- Audit Logs
-- Data Isolation
-
----
-
-## 🚀 المراحل المخططة
-
-### المرحلة 0 — اكتشاف المستودع والتصميم ✅
-- [x] فحص المستودع والتقنيات الحالية
-- [x] إنشاء تقرير الحالة
-- [x] حصر المتطلبات والتعارضات
-- [x] توثيق architecture decisions
-- [x] تحديد طريقة تشغيل محلية وبيئة اختبار
-- [x] اختيار اسم المنصة: **Al-Mada**
-- [x] تجهيز القرارات المفتوحة
-
-### المرحلة 1 — أساس التطبيق ✅
-- [x] إعداد المشروع (Next.js 15.5.29, TypeScript strict, Tailwind v4)
-- [x] إعداد CI/CD (GitHub Actions — lint, typecheck, build, test)
-- [x] إدارة الأسرار (GitHub Actions secrets + Vercel env vars)
-- [x] قاعدة البيانات والترحيلات (60 جدول، RLS + FORCE، 231 policy)
-- [x] تسجيل الأخطاء والمراقبة (Vercel Analytics + n8n health + Telegram alerts)
-- [x] نشر Vercel + GitHub-Vercel auto-deploy
-- [x] نشر n8n workflows (Telegram relay, daily appointments report)
-
-### المرحلة 2 — الهوية وعزل العيادات
-- [ ] تسجيل الدخول
-- [ ] نموذج العيادات والمستخدمين
-- [ ] سياسات عزل البيانات
-- [ ] اختبارات العزل
-- [ ] سجل تدقيق
-
-### المرحلة 3 — النواة التشغيلية
-- [ ] الفروع والأطباء
-- [ ] ملفات المرضى والزيارات
-- [ ] الفواتير والحسابات
-- [ ] تقارير أساسية
-
-### المرحلة 4 — الملفات والتعافي والتصدير
-- [ ] رفع وتنزيل آمن
-- [ ] النسخ الاحتياطي والاستعادة
-- [ ] تصدير البيانات
-- [ ] سياسة الاحتفاظ والحذف
-
-### المرحلة 5 — الاشتراكات والتكاملات
-- [ ] خطط الاشتراك
-- [ ] اختبار الدورة
-- [ ] تكامل الدفع
-- [ ] تكامل واتساب
-
-### المرحلة 6 — الذكاء الاصطناعي
-- [ ] أساس البنية الهجينة
-- [ ] مساعد الطبيب
-- [ ] المساعد الإداري
-- [ ] مساعد الاستقبال
-
-### المرحلة 7 — الإطلاق التجريبي
-- [ ] اختبار أمني
-- [ ] تجربة ببيانات وهمية
-- [ ] مراقبة الأعطال
-- [ ] توثيق التشغيل
-
-### المرحلة 8 — التوسع
-- [ ] إطلاق تدريجي
-- [ ] مراجعة التكلفة
-- [ ] إضافة الميزات المتقدمة
-
----
-
-## 📋 القرارات الأساسية
-
-### AI Providers
-- **التوصية:** طبقة تجريد (`lib/ai/provider.ts`) + Groq مجاني في التطوير
-- **السبب:** صفر تكلفة + قابلية تبديل المزود (§28.5) + لا بيانات صحية قبل إشعار قانوني
-
-### n8n Hosting
-- **القرار:** الـ VPS الموجود (شغال بالفعل ✅)
-- **السبب:** متاح ومركّب عليه API key — مش محتاج SSH ولا فلوس
-
-### Monitoring
-- **Sentry Free** + Vercel Analytics + n8n health + Telegram alerts
-- Grafana/Prometheus مؤجَّل (مش محتاجين على VPS صغير)
-
-### Database
-- **Supabase Free** (`eu-central-1` Frankfurt) — بيانات وهمية فقط حتى المراجعة القانونية
-- ⚠️ Supabase مفيش منطقة مصر → بند residency مفتوح (ADR-003)
-
-### Hosting
-- **Vercel** للتطوير/PR previews (Hobby = غير تجاري)
-- **الإنتاج التجاري:** self-host على الـ VPS (نفس البناء، تكلفة حدية $0) — راجع ADR-002
-
-### Payments
-- **Paymob** (إيرادات) + **InstaPay** (تحصيل مرضى) — بعد بوابة ب
-
-### RPO/RTO
-- **RPO:** 1 ساعة · **RTO:** 4 ساعات
-- ⚠️ Free tier مفيش PITR → موثّق كحد، سبب إضافي لحسم Plan قبل الإنتاج
-
-### اسم المنصة
-- **Al-Mada** — يعني "المَدَى" (المسار/المستقبل)
-- **URL:** `al-mada.eg` (لاحقًا) / `*.vercel.app` (مرحليًا)
-
----
-
-## 📁 هيكل المستودع
-
-```
-al-mada/
-├── .github/
-│   └── workflows/
-│       ├── ci.yml
-│       └── deploy.yml
-├── apps/
-│   ├── web/                    # Next.js Frontend
-│   └── api/                    # Next.js API Routes
-├── packages/
-│   ├── ui/                     # shadcn/ui components
-│   └── db/                     # Database helpers
-├── supabase/
-│   ├── migrations/
-│   └── seed.sql
-├── n8n/
-│   ├── workflows/
-│   └── credentials.json
-├── docs/
-│   ├── architecture.md
-│   ├── api.md
-│   └── deployment.md
-├── .env.example
-├── .env.local
-├── README.md
-├── LICENSE
-└── .gitignore
-```
-
----
-
-## 🔧 متطلبات التشغيل
-
-### Local Development
-```bash
-# Install dependencies
-npm install
-
-# Setup environment variables
-cp .env.example .env.local
-# Edit .env.local with your values
-
-# Setup Supabase
-npx supabase init
-npx supabase link --project-ref <your-project-ref>
-npx supabase db push
-
-# Run migrations
-npx supabase db reset
-
-# Start development server
-npm run dev
-```
-
-### Environment Variables
 ```env
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-
-# OpenAI
-OPENAI_API_KEY=your_openai_key
-
-# n8n
-N8N_WEBHOOK_URL=https://your-n8n-domain.com
-N8N_API_KEY=your_n8n_api_key
-
-# Paymob
-PAYMOB_MERCHANT_CODE=your_paymob_code
-PAYMOB_API_KEY=your_paymob_api_key
-
-# Telegram
-TELEGRAM_BOT_TOKEN=your_bot_token
-TELEGRAM_CHANNEL_ID=your_channel_id
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-or-publishable-key
 ```
 
----
+## الأوامر
 
-## 📖 التوثيق
+```bash
+npm run dev
+npm run lint
+npm run typecheck
+npm run test
+npm run build
+```
 
-- **[تقرير الحالة الحالية](./CURRENT_STATE_REPORT.md)** — تقرير شامل للمشروع
-- **[حالة التنفيذ](./IMPLEMENTATION_STATUS.md)** — حالة المراحل الحالية
-- **[القرارات المفتوحة](./OPEN_DECISIONS_FINAL.md)** — القرارات والتوصيات
-- **[المرجع الكامل](./README_START_HERE_AR.md)** — دليل البدء
+## خارطة البناء
 
----
+1. المصادقة، إعداد العيادة، العضويات، وسياسات الوصول والعزل.
+2. إدارة الموظفين والفروع والمرضى والمواعيد والطابور.
+3. الزيارات والسجلات الطبية والمرفقات مع سجل تدقيق.
+4. الفواتير والتحصيل والتقارير التشغيلية.
+5. النسخ الاحتياطي والتصدير والاشتراكات والتكاملات.
+6. بوابة المريض: السجلات الخاصة به، التحاليل والأشعة، دليل رعاية موثوق، ثم عروض معلّمة بوضوح.
+7. السوق الطبي وشبكة الإعلانات: شركات الأدوية والصيدليات والمعامل والأشعة ومورّدو المستلزمات، مع إدارة حملات مستقلة عن المحتوى الطبي.
+8. ميزات AI بعد ضوابط موافقة الطبيب والخصوصية ومكان المعالجة.
 
-## 🤝 المساهمين
+المواصفات الكاملة للمنتج وخطة المراحل والقبول محفوظة في [docs/spec-v2](./docs/spec-v2/README.md). الحالة الفعلية لكل مرحلة في [IMPLEMENTATION_STATUS.md](./IMPLEMENTATION_STATUS.md).
 
-هذا مشروع من صميم **Mahmoud Khamis** — مالك المنصة.
-
----
-
-## 📄 الترخيص
-
-هذا المشروع مفتوح المصدر (Open Source) — راجع ملف `LICENSE` للمزيد من التفاصيل.
-
----
-
-## 📞 التواصل
-
-- **الموقع:** al-mada.eg
-- **البريد:** support@al-mada.eg
-- **واتساب:** +20 XXX XXX XXXX
-
----
-
-## 🙏 الشكر
-
-- **OpenAI:** للـ GPT-4o و Whisper
-- **Supabase:** لقاعدة البيانات السحابية
-- **n8n:** للأتمتة والذكاء الاصطناعي
-- **shadcn/ui:** للواجهات الرسومية
-- **Tailwind CSS:** للتصميم السريع
-
----
-
-**تم التطوير بواسطة Hermes Agent**
-**التاريخ:** 2026-11-04
-**الحالة:** ✅ Phase 1 — Foundation Complete (Launch-ready)
+قبل إدخال بيانات مرضى حقيقية، يلزم مراجعة أمنية مستقلة وسياسات RLS فعليًا على بيئة اختبار، وحسم متطلبات حماية البيانات وموقع الاستضافة والنسخ الاحتياطي.
