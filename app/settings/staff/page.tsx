@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { getCurrentSession } from '@/lib/session';
 import { listStaff } from '@/lib/staff';
 import { StaffEditDialog } from './staff-edit-dialog';
+import { AddStaffDialog } from './add-staff-dialog';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,9 +39,7 @@ export default async function StaffSettingsPage() {
           </div>
 
           <div className="flex items-center gap-2">
-            <Link href="/appointments" className="secondary-button text-xs py-2 px-3">
-              + إضافة طبيب للجدول
-            </Link>
+            <AddStaffDialog />
           </div>
         </header>
 
