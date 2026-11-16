@@ -24,7 +24,11 @@ export default async function TrashPage() {
           <div>
             <div className="flex items-center gap-2 text-xs text-slate-500">
               <Link href="/" className="text-teal-800 hover:underline">
-                ← لوحة العيادة
+                لوحة العيادة
+              </Link>
+              <span>/</span>
+              <Link href="/settings" className="text-teal-800 hover:underline">
+                مركز الإعدادات
               </Link>
               <span>/</span>
               <span>سلة المحذوفات والأرشفة</span>

@@ -25,10 +25,14 @@ export default async function StaffSettingsPage() {
           <div>
             <div className="flex items-center gap-2 text-xs text-slate-500">
               <Link href="/" className="text-teal-800 hover:underline">
-                ← لوحة العيادة
+                لوحة العيادة
               </Link>
               <span>/</span>
-              <span>إدارة العيادة</span>
+              <Link href="/settings" className="text-teal-800 hover:underline">
+                مركز الإعدادات
+              </Link>
+              <span>/</span>
+              <span>إدارة الطاقم الطبي والإداري</span>
             </div>
             <h1 className="mt-2 text-2xl font-bold text-slate-900">
               إدارة الطاقم الطبي والإداري

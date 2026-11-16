@@ -24,10 +24,14 @@ export default async function ExportPage() {
           <div>
             <div className="flex items-center gap-2 text-xs text-slate-500">
               <Link href="/" className="text-teal-800 hover:underline">
-                ← لوحة العيادة
+                لوحة العيادة
               </Link>
               <span>/</span>
-              <span>مركز تصدير البيانات والنسخ الاحتياطي</span>
+              <Link href="/settings" className="text-teal-800 hover:underline">
+                مركز الإعدادات
+              </Link>
+              <span>/</span>
+              <span>تصدير البيانات</span>
             </div>
             <h1 className="mt-2 text-2xl font-bold text-slate-900">تصدير بيانات العيادة (Data Export)</h1>
             <p className="mt-1 text-sm text-slate-600">

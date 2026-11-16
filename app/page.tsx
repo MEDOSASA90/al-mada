@@ -202,7 +202,12 @@ export default async function Home() {
         {/* Live Metrics Stats */}
         <section className="grid grid-cols-2 gap-4 md:grid-cols-4">
           <Stat label="المرضى المسجلون" value={patients.length} tone="blue" href="/patients" />
-          <Stat label="الأطباء المتاحون" value={doctors.length} tone="green" href="/appointments" />
+          <Stat
+            label="الأطباء المتاحون"
+            value={doctors.length}
+            tone="green"
+            href={isOwner ? '/settings/staff' : '/appointments'}
+          />
           <Stat label="مواعيد اليوم" value={todayAppointments} tone="amber" href="/appointments" />
           <Stat
             label={isDoctor && !isOwner ? 'أتعابي المستحقة' : 'الإيرادات المحصلة'}

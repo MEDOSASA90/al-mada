@@ -29,7 +29,7 @@ export default async function SubscriptionPage() {
             <div className="flex items-center gap-2 text-sm text-slate-500 mb-1">
               <Link href="/" className="hover:text-teal-800">الرئيسية</Link>
               <span>/</span>
-              <Link href="/settings/staff" className="hover:text-teal-800">الإعدادات</Link>
+              <Link href="/settings" className="hover:text-teal-800">مركز الإعدادات</Link>
               <span>/</span>
               <span className="text-slate-900 font-medium">الاشتراك والفوترة</span>
             </div>
