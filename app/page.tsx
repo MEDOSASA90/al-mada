@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { listPatients } from '@/lib/patients';
-import { listDoctors } from '@/lib/staff';
+import { listDoctors, listBranches } from '@/lib/staff';
 import { countAppointmentsForToday } from '@/lib/appointments';
 import { getTotalRevenue } from '@/lib/billing';
 import { getCurrentSession } from '@/lib/session';
@@ -23,19 +23,22 @@ export default async function Home() {
 
   let patients: Awaited<ReturnType<typeof listPatients>> = [];
   let doctors: Awaited<ReturnType<typeof listDoctors>> = [];
+  let branches: Awaited<ReturnType<typeof listBranches>> = [];
   let todayAppointments = 0;
   let revenue = 0;
   let error: string | null = null;
 
   try {
-    const [pts, docs, apptsCount, rev] = await Promise.all([
+    const [pts, docs, branchList, apptsCount, rev] = await Promise.all([
       listPatients({ limit: 25 }),
       listDoctors(),
+      listBranches(),
       countAppointmentsForToday(),
       getTotalRevenue(),
     ]);
     patients = pts;
     doctors = docs;
+    branches = branchList;
     todayAppointments = apptsCount;
     revenue = rev;
   } catch (e) {
@@ -186,7 +189,7 @@ export default async function Home() {
           </div>
         )}
 
-        <PatientForm />
+        <PatientForm doctors={doctors} branches={branches} />
 
         {/* Recent Patients */}
         <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
+import { isDemoSession } from '@/lib/session';
 
 export type AppointmentFormState = { message: string; success: boolean };
 
@@ -17,7 +18,8 @@ export async function createDoctorAction(_previous: AppointmentFormState, formDa
     return { message: 'اكتب اسم الطبيب من حرفين إلى 160 حرفًا.', success: false };
   }
 
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  const isDemo = await isDemoSession();
+  if (isDemo) {
     revalidatePath('/appointments');
     return { message: 'تمت إضافة الطبيب بنجاح (وضع المعاينة التجريبي).', success: true };
   }
@@ -65,7 +67,8 @@ export async function createAppointmentAction(_previous: AppointmentFormState, f
   if (!['clinic', 'telemedicine', 'home', 'emergency'].includes(visit_type)) return { message: 'نوع الزيارة غير صالح.', success: false };
   if (reason && reason.length > 500) return { message: 'سبب الزيارة أطول من المسموح.', success: false };
 
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  const isDemo = await isDemoSession();
+  if (isDemo) {
     revalidatePath('/appointments');
     return { message: 'تم حجز الموعد بنجاح (وضع المعاينة التجريبي).', success: true };
   }
@@ -95,7 +98,8 @@ export async function changeAppointmentStatusAction(_previous: AppointmentFormSt
   if (!validUuid(id) || !['confirmed', 'canceled', 'no_show'].includes(status)) return { message: 'الطلب غير صالح.', success: false };
   const reason = String(formData.get('reason') ?? '').trim() || null;
 
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  const isDemo = await isDemoSession();
+  if (isDemo) {
     revalidatePath('/appointments');
     return { message: 'تم تحديث حالة الموعد (وضع المعاينة التجريبي).', success: true };
   }
@@ -114,7 +118,8 @@ export async function changeAppointmentStatusAction(_previous: AppointmentFormSt
 export async function issueQueueTicketAction(appointmentId: string): Promise<AppointmentFormState> {
   if (!validUuid(appointmentId)) return { message: 'معرّف الموعد غير صالح.', success: false };
 
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  const isDemo = await isDemoSession();
+  if (isDemo) {
     revalidatePath('/appointments');
     revalidatePath('/queue');
     return { message: 'تم إصدار تذكرة انتظار رقم #4 وإدراج المريض في الطابور (وضع المعاينة التجريبي).', success: true };

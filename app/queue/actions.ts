@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
+import { isDemoSession } from '@/lib/session';
 
 export async function advanceTicketAction(ticketId: string, status: string) {
   if (!/^[0-9a-f-]{36}$/i.test(ticketId)) {
@@ -11,8 +12,10 @@ export async function advanceTicketAction(ticketId: string, status: string) {
     return { ok: false, message: 'الحالة غير صالحة.' };
   }
 
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  const isDemo = await isDemoSession();
+  if (isDemo) {
     revalidatePath('/queue');
+    revalidatePath('/appointments');
     return { ok: true, message: 'تم تحديث دور المريض في الطابور (وضع المعاينة التجريبي).' };
   }
 

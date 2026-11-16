@@ -9,6 +9,15 @@ export type CurrentSession = {
   isDemo: boolean;
 };
 
+export async function isDemoSession(): Promise<boolean> {
+  const cookieStore = await cookies();
+  const demoRoleCookie = cookieStore.get('almada_demo_role')?.value;
+  if (demoRoleCookie && ['clinic_owner', 'doctor', 'receptionist', 'accountant'].includes(demoRoleCookie)) {
+    return true;
+  }
+  return !process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+}
+
 export async function getCurrentSession(): Promise<CurrentSession | null> {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
