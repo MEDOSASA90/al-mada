@@ -118,6 +118,69 @@ export function ConsultationForm({
         </div>
       )}
 
+      {/* Al-Mada Cross-Clinic Universal Safety Guard (كارت الأمان الدوائي الموحد عبر شبكة المدى) */}
+      <section className="rounded-2xl border-2 border-rose-200 bg-rose-50/60 p-4.5 shadow-xs">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-rose-200/60 pb-3 mb-3">
+          <div className="flex items-center gap-2">
+            <span className="text-xl">🛡️</span>
+            <div>
+              <h3 className="text-sm font-bold text-rose-950 flex items-center gap-2">
+                <span>كارت الأمان الدوائي الموحد (شبكة المدى الطبية)</span>
+                <span className="text-[10px] bg-rose-600 text-white px-2 py-0.5 rounded-full font-bold">
+                  تنبيه سلامة عابر للعيادات
+                </span>
+              </h3>
+              <p className="text-[11px] text-rose-900/80">
+                هذه التحذيرات مستخرجة من السجل الصحي الموحد للمريض {patientName} عبر كافة عيادات الشبكة لمنع التداخلات الدوائية القاتلة.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 text-xs">
+            <span className="rounded-md bg-white border border-rose-200 px-2 py-1 font-bold text-slate-800">
+              فصيلة الدم: <span className="text-rose-600 font-black">A+</span>
+            </span>
+          </div>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          {/* Contraindicated Drug Classes */}
+          <div className="rounded-xl bg-white border border-rose-200 p-3">
+            <p className="text-xs font-bold text-rose-950 flex items-center gap-1 mb-1.5">
+              <span>⛔</span>
+              <span>موانع الاستعمال الدوائية المحظورة (Allergies)</span>
+            </p>
+            <div className="space-y-1.5">
+              <div className="rounded bg-rose-100/70 p-2 text-xs text-rose-950">
+                <strong className="block font-bold">بنسلين ومشتقاته (Penicillin & Amoxicillin):</strong>
+                <span className="text-[11px] text-rose-900">سُجلت صدمة تحسسية (Anaphylaxis Risk) سابقة. يُحظر وصف أوجمنتين أو هايبوتك أو فلوموكس.</span>
+              </div>
+              <div className="rounded bg-amber-100/70 p-2 text-xs text-amber-950">
+                <strong className="block font-bold">مركبات السلفا (Sulfa Drugs):</strong>
+                <span className="text-[11px] text-amber-900">تاريخ حساسية جلدية وتورم. يُحظر وصف سيبتازول ومضادات السلفا.</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Chronic Conditions & Prescribing Precautions */}
+          <div className="rounded-xl bg-white border border-rose-200 p-3">
+            <p className="text-xs font-bold text-slate-900 flex items-center gap-1 mb-1.5">
+              <span>🩺</span>
+              <span>الأمراض المزمنة ومحاذير الوصف (Precautions)</span>
+            </p>
+            <div className="space-y-1.5">
+              <div className="rounded bg-slate-50 border border-slate-200 p-2 text-xs text-slate-900">
+                <strong className="block font-semibold">ربو شعبي وحساسية صدرية (Bronchial Asthma):</strong>
+                <span className="text-[11px] text-slate-600">تجنب مسكنات NSAIDs (مثل كتافلام، فولتارين، كيتولاك) لتفادي حدوث تشنج قصبي حاد.</span>
+              </div>
+              <div className="rounded bg-slate-50 border border-slate-200 p-2 text-xs text-slate-900">
+                <strong className="block font-semibold">داء السكري النوع الثاني (Type 2 Diabetes):</strong>
+                <span className="text-[11px] text-slate-600">المريض يتناول ميتفورمين 1000 مجم. احذر الكورتيزون والمحاليل السكرية.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* AI Clinical Scribe & History Copilot (Phase 6) */}
       <AIClinicalScribe
         appointmentId={appointmentId}
