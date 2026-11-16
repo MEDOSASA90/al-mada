@@ -63,6 +63,7 @@ export default async function ElectronicPrescriptionPage({
           licenseNumber="34892/2018"
           patientName={appointment.patient_name || patient?.full_name || 'مريض'}
           patientFileNumber={appointment.patient_file_number || patient?.file_number || '000101'}
+          patientPhone={patient?.phone || appointment.patient_phone || ''}
           patientBirthDate={patient?.birth_date}
           patientGender={patient?.gender}
           diagnosis={record?.diagnosis || 'متابعة دورية وفحص باطنة'}

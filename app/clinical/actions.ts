@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
+import { isDemoSession } from '@/lib/session';
 
 export type ClinicalFormState = { message: string; success: boolean };
 
@@ -41,7 +42,8 @@ export async function saveConsultationAction(
     return { message: 'بيانات المريض أو الطبيب غير صالحة.', success: false };
   }
 
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  const isDemo = await isDemoSession();
+  if (isDemo) {
     if (appointmentId) revalidatePath(`/clinical/${appointmentId}`);
     return { message: 'تم حفظ الكشف الطبي بنجاح (وضع المعاينة التجريبي).', success: true };
   }
@@ -75,7 +77,8 @@ export async function saveConsultationAction(
 export async function lockConsultationAction(recordId: string, appointmentId?: string): Promise<ClinicalFormState> {
   if (!validUuid(recordId)) return { message: 'معرّف السجل غير صالح.', success: false };
 
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  const isDemo = await isDemoSession();
+  if (isDemo) {
     if (appointmentId) revalidatePath(`/clinical/${appointmentId}`);
     return { message: 'تم اعتماد وقفل السجل الطبي كنسخة نهائية (وضع المعاينة التجريبي).', success: true };
   }

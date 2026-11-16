@@ -27,9 +27,15 @@ export function ConsultationForm({
   const [state, formAction, isPending] = useActionState(saveConsultationAction, initialState);
   const [locking, setLocking] = useState(false);
   const [lockMsg, setLockMsg] = useState('');
+  const [treatmentPlan, setTreatmentPlan] = useState(existingRecord?.treatment_plan || '');
 
   const isLocked = existingRecord?.is_locked ?? false;
   const vitals = existingRecord?.vitals ?? {};
+
+  function appendPreset(presetText: string) {
+    if (isLocked) return;
+    setTreatmentPlan((prev) => (prev ? `${prev.trim()}\n• ${presetText}` : `• ${presetText}`));
+  }
 
   async function handleLock() {
     if (!existingRecord?.id) return;
@@ -196,14 +202,75 @@ export function ConsultationForm({
           </h3>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700">الأدوية والجرعات والتعليمات</label>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <label className="block text-sm font-medium text-slate-700">الأدوية والجرعات والتعليمات</label>
+              <Link
+                href={`/clinical/${appointmentId}/prescription`}
+                className="text-xs font-semibold text-teal-800 hover:underline inline-flex items-center gap-1"
+              >
+                <span>معاينة الروشتة الرسمية (PDF) ←</span>
+              </Link>
+            </div>
+
+            {/* Quick Dosage Presets */}
+            {!isLocked && (
+              <div className="my-2.5 rounded-xl bg-slate-50 border border-slate-200/80 p-3">
+                <span className="text-[11px] font-bold text-slate-500 block mb-2">⚡ قوالب جرعات جاهزة (انقر للإضافة السريعة):</span>
+                <div className="flex flex-wrap gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => appendPreset('قرص 3 مرات يومياً بعد الأكل (لمدة 5 أيام)')}
+                    className="rounded-lg border border-teal-200 bg-white px-2.5 py-1 text-xs text-teal-900 hover:bg-teal-50 transition"
+                  >
+                    + قرص 3 مرات بعد الأكل (5 أيام)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => appendPreset('قرص مرتين يومياً كل 12 ساعة بعد الأكل (لمدة 7 أيام)')}
+                    className="rounded-lg border border-teal-200 bg-white px-2.5 py-1 text-xs text-teal-900 hover:bg-teal-50 transition"
+                  >
+                    + قرص مرتين كل 12 ساعة (7 أيام)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => appendPreset('قرص واحد يومياً صباحاً على الريق (شهر)')}
+                    className="rounded-lg border border-teal-200 bg-white px-2.5 py-1 text-xs text-teal-900 hover:bg-teal-50 transition"
+                  >
+                    + قرص صباحاً على الريق (شهر)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => appendPreset('كبسولة واحدة مساءً قبل النوم مباشرة')}
+                    className="rounded-lg border border-teal-200 bg-white px-2.5 py-1 text-xs text-teal-900 hover:bg-teal-50 transition"
+                  >
+                    + كبسولة قبل النوم
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => appendPreset('مسكن باراسيتامول عند اللزوم (بحد أقصى 3 مرات يومياً بعد الأكل)')}
+                    className="rounded-lg border border-teal-200 bg-white px-2.5 py-1 text-xs text-teal-900 hover:bg-teal-50 transition"
+                  >
+                    + مسكن عند اللزوم
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => appendPreset('دهان موضعي مرتين يومياً صباحاً ومساءً')}
+                    className="rounded-lg border border-teal-200 bg-white px-2.5 py-1 text-xs text-teal-900 hover:bg-teal-50 transition"
+                  >
+                    + دهان موضعي مرتين
+                  </button>
+                </div>
+              </div>
+            )}
+
             <textarea
               name="treatment_plan"
-              defaultValue={existingRecord?.treatment_plan || ''}
+              value={treatmentPlan}
+              onChange={(e) => setTreatmentPlan(e.target.value)}
               disabled={isLocked}
-              rows={4}
-              placeholder="اسم الدواء — الجرعة والتكرار — المدة (مثال: Amoxicillin 500mg - قرص كل 8 ساعات لمدة 7 أيام)"
-              className="field mt-1 w-full"
+              rows={5}
+              placeholder="اسم الدواء — الجرعة والتكرار — المدة (أو اختر من القوالب السريعة أعلاه)"
+              className="field mt-1 w-full font-mono text-sm"
             />
           </div>
 

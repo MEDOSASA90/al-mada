@@ -3,6 +3,7 @@ import { notFound, redirect } from 'next/navigation';
 import { getCurrentSession } from '@/lib/session';
 import { getInvoice } from '@/lib/billing';
 import { PaymentDialog } from './payment-dialog';
+import { PrintReceiptButton } from './print-receipt-button';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,6 +34,7 @@ export default async function InvoiceDetailPage({
             ← قائمة الفواتير
           </Link>
           <div className="flex items-center gap-2">
+            <PrintReceiptButton />
             {remaining > 0 && (
               <PaymentDialog invoiceId={invoice.id} remainingAmount={remaining} />
             )}

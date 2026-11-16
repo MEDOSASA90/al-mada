@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
+import { isDemoSession } from '@/lib/session';
 
 export type BillingFormState = { message: string; success: boolean; invoiceId?: string };
 
@@ -44,7 +45,8 @@ export async function createInvoiceAction(
     return { message: 'أضف بنداً واحداً على الأقل للفاتورة (مثال: كشف، استشارة، غيار، تحليل).', success: false };
   }
 
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  const isDemo = await isDemoSession();
+  if (isDemo) {
     revalidatePath('/billing');
     return { message: 'تم إصدار الفاتورة بنجاح (وضع المعاينة التجريبي).', success: true, invoiceId: '77777777-7777-7777-7777-777777777771' };
   }
@@ -81,7 +83,8 @@ export async function recordPaymentAction(
     return { ok: false, message: 'بيانات الدفعة غير صالحة.' };
   }
 
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  const isDemo = await isDemoSession();
+  if (isDemo) {
     revalidatePath(`/billing/${invoiceId}`);
     return { ok: true, message: 'تم تسجيل تحصيل الدفعة بنجاح وتحديث حساب الفاتورة (وضع المعاينة التجريبي).' };
   }
@@ -118,7 +121,8 @@ export async function addExpenseAction(_previous: BillingFormState, formData: Fo
     return { message: 'اكتب وصفاً صالحاً ومبلغاً أكبر من صفر.', success: false };
   }
 
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  const isDemo = await isDemoSession();
+  if (isDemo) {
     revalidatePath('/billing');
     return { message: 'تم تسجيل المصروف بنجاح وخصمه من عهدة الدرج (وضع المعاينة التجريبي).', success: true };
   }
@@ -148,7 +152,8 @@ export async function closeShiftAction(actualCash: number, notes?: string): Prom
     return { ok: false, message: 'المبلغ الفعلي المدخل غير صالح.' };
   }
 
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  const isDemo = await isDemoSession();
+  if (isDemo) {
     revalidatePath('/billing');
     return { ok: true, message: 'تم تقفيل وردية الكاشير بنجاح واعتماد النقدية الفعلية (وضع المعاينة التجريبي).' };
   }

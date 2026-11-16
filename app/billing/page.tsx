@@ -11,6 +11,7 @@ import {
 } from '@/lib/billing';
 import { ExpenseForm } from './expense-form';
 import { ShiftClosingDialog } from './shift-closing-dialog';
+import { DoctorPayoutButton } from './doctor-payout-button';
 
 export const dynamic = 'force-dynamic';
 
@@ -160,6 +161,7 @@ export default async function BillingPage({
                     <th className="p-3 text-center">النسبة</th>
                     <th className="p-3 text-teal-900 font-bold">مستحقات الطبيب</th>
                     {isOwner && <th className="p-3 text-slate-700">نصيب العيادة</th>}
+                    {isOwner && <th className="p-3 text-center">توثيق الصرف</th>}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -172,6 +174,15 @@ export default async function BillingPage({
                       <td className="p-3 text-center font-bold text-teal-800">%{doc.commission_rate}</td>
                       <td className="p-3 font-mono font-bold text-emerald-800">{doc.doctor_payout} ج.م</td>
                       {isOwner && <td className="p-3 font-mono text-slate-600">{doc.clinic_share} ج.م</td>}
+                      {isOwner && (
+                        <td className="p-3 text-center">
+                          <DoctorPayoutButton
+                            doctorId={doc.doctor_id}
+                            doctorName={doc.doctor_name}
+                            amount={doc.doctor_payout}
+                          />
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>

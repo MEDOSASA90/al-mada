@@ -22,6 +22,7 @@ type Props = {
   licenseNumber?: string;
   patientName: string;
   patientFileNumber: string;
+  patientPhone?: string | null;
   patientBirthDate?: string | null;
   patientGender?: string | null;
   diagnosis?: string | null;
@@ -39,6 +40,7 @@ export function PrescriptionView({
   licenseNumber = '34892/2018',
   patientName,
   patientFileNumber,
+  patientPhone,
   patientBirthDate,
   patientGender,
   diagnosis,
@@ -57,6 +59,15 @@ export function PrescriptionView({
   function handlePrint() {
     window.print();
   }
+
+  // Format phone and WhatsApp message
+  const cleanPhone = patientPhone ? patientPhone.replace(/[^0-9]/g, '') : '';
+  const waPhone = cleanPhone.startsWith('0') ? '2' + cleanPhone : cleanPhone;
+  const medsSummary = prescriptionItems.map((item, i) => `${i + 1}. ${item.medication_name} (${item.frequency || ''} - ${item.timing || ''})`).join('\n');
+  const waMsg = encodeURIComponent(
+    `أهلاً بك أستاذ ${patientName}،\nإليك الروشتة الطبية الإلكترونية الصادرة لك من ${clinicName} بتاريخ ${appointmentDate} مع ${doctorName}:\n\nالتشخيص: ${diagnosis || 'متابعة وفحص'}\n\nالأدوية المقررة:\n${medsSummary}\n\n${generalInstructions ? `نصائح وإرشادات: ${generalInstructions}\n\n` : ''}نتمنى لكم دوام الصحة والعافية.`
+  );
+  const waLink = waPhone ? `https://wa.me/${waPhone}?text=${waMsg}` : null;
 
   // QR Code payload for digital verification
   const qrPayload = encodeURIComponent(
@@ -95,6 +106,20 @@ export function PrescriptionView({
           >
             {withHeader ? '✓ طباعة بترويسة العيادة' : '📄 وضع الورق المطبوع مسبقاً (بدون ترويسة)'}
           </button>
+
+          {/* Send via WhatsApp */}
+          {waLink && (
+            <a
+              href={waLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3.5 py-2 text-xs font-bold text-white hover:bg-emerald-700 transition shadow-xs"
+              title="إرسال بيانات الروشتة والأدوية للمريض مباشرة عبر واتساب"
+            >
+              <span>💬</span>
+              <span>إرسال بالواتساب للمريض</span>
+            </a>
+          )}
 
           {/* Print / Save PDF Button */}
           <button
