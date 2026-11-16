@@ -185,14 +185,16 @@ export default async function Home() {
                 <span className="block text-sm font-bold text-slate-800 group-hover:text-teal-900">المخزون الطبي</span>
                 <span className="block text-[11px] text-slate-500">مستلزمات وعهد العيادة</span>
               </Link>
-              <Link
-                href="/settings"
-                className="flex-1 min-w-[130px] rounded-xl bg-slate-50 hover:bg-teal-50 border border-slate-200 hover:border-teal-300 p-3 text-center transition group"
-              >
-                <span className="block text-xl mb-1">⚙️</span>
-                <span className="block text-sm font-bold text-slate-800 group-hover:text-teal-900">إعدادات النظام</span>
-                <span className="block text-[11px] text-slate-500">الفروع والطاقم والنسخ</span>
-              </Link>
+              {isOwner && (
+                <Link
+                  href="/settings"
+                  className="flex-1 min-w-[130px] rounded-xl bg-slate-50 hover:bg-teal-50 border border-slate-200 hover:border-teal-300 p-3 text-center transition group"
+                >
+                  <span className="block text-xl mb-1">⚙️</span>
+                  <span className="block text-sm font-bold text-slate-800 group-hover:text-teal-900">إعدادات النظام</span>
+                  <span className="block text-[11px] text-slate-500">الفروع والطاقم والنسخ</span>
+                </Link>
+              )}
             </>
           )}
         </nav>
