@@ -14,6 +14,14 @@ export default async function SettingsHubPage() {
 
   const settingsCards = [
     {
+      title: 'صحة النظام وجاهزية الإطلاق التشغيلي',
+      description: 'فحص تشخيصي فوري لقاعدة البيانات، سياسات عزل المستأجرين، زمن الاستجابة، والامتثال لقانون 151.',
+      icon: '🛡️',
+      href: '/settings/health',
+      badge: 'المرحلة 7',
+      ownerOnly: true,
+    },
+    {
       title: 'منظومة الذكاء الاصطناعي والمساعد التنفيذي',
       description: 'ضبط نماذج الذكاء الاصطناعي، الاستعلام باللغة الطبيعية عن أداء العيادة، ومراقبة استهلاك الرموز.',
       icon: '🤖',
