@@ -13,6 +13,7 @@ export type QueueTicket = {
   served_at: string | null;
   created_at: string;
   patient_name?: string;
+  patient_phone?: string;
   doctor_name?: string;
 };
 
@@ -37,16 +38,20 @@ export async function listActiveQueueTickets(): Promise<QueueTicket[]> {
   const doctorIds = Array.from(new Set(tickets.map((t) => t.doctor_id).filter((id): id is string => Boolean(id))));
 
   const [patientsRes, doctorsRes] = await Promise.all([
-    patientIds.length > 0 ? supabase.from('patients').select('id,full_name').in('id', patientIds) : { data: [] },
+    patientIds.length > 0 ? supabase.from('patients').select('id,full_name,phone').in('id', patientIds) : { data: [] },
     doctorIds.length > 0 ? supabase.from('staff_profiles').select('id,full_name').in('id', doctorIds) : { data: [] },
   ]);
 
-  const pMap = new Map((patientsRes.data ?? []).map((p) => [p.id, p.full_name]));
+  const pMap = new Map((patientsRes.data ?? []).map((p) => [p.id, p]));
   const dMap = new Map((doctorsRes.data ?? []).map((d) => [d.id, d.full_name]));
 
-  return tickets.map((t) => ({
-    ...t,
-    patient_name: pMap.get(t.patient_id) ?? 'مريض',
-    doctor_name: t.doctor_id ? dMap.get(t.doctor_id) ?? 'طبيب' : undefined,
-  }));
+  return tickets.map((t) => {
+    const pat = pMap.get(t.patient_id);
+    return {
+      ...t,
+      patient_name: pat?.full_name ?? 'مريض',
+      patient_phone: pat?.phone,
+      doctor_name: t.doctor_id ? dMap.get(t.doctor_id) ?? 'طبيب' : undefined,
+    };
+  });
 }

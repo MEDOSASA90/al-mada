@@ -203,6 +203,22 @@ export async function getTodayShift(): Promise<CashierShift | null> {
   } as CashierShift;
 }
 
+export async function listInvoicesForPatient(patientId: string): Promise<Invoice[]> {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return DEMO_INVOICES.filter((inv) => inv.patient_id === patientId) as Invoice[];
+  }
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('invoices')
+    .select('id,invoice_number,invoice_type,status,subtotal,discount_total,total,paid_total,currency,notes,issued_at,paid_at,patient_id,appointment_id')
+    .eq('patient_id', patientId)
+    .is('deleted_at', null)
+    .order('issued_at', { ascending: false });
+
+  if (error || !data) return [];
+  return data as Invoice[];
+}
+
 export async function listDoctorCommissions(opts?: { doctorId?: string; isOwner?: boolean }): Promise<DoctorCommission[]> {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     if (opts?.doctorId && !opts?.isOwner) {

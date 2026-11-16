@@ -301,6 +301,7 @@ export const DEMO_QUEUE_TICKETS = [
     served_at: '2026-11-15T10:05:00Z',
     created_at: '2026-11-15T09:45:00Z',
     patient_name: DEMO_PATIENTS[0].full_name,
+    patient_phone: DEMO_PATIENTS[0].phone,
     doctor_name: DEMO_DOCTORS[0].full_name,
   },
   {
@@ -315,6 +316,7 @@ export const DEMO_QUEUE_TICKETS = [
     served_at: null,
     created_at: '2026-11-15T10:15:00Z',
     patient_name: DEMO_PATIENTS[1].full_name,
+    patient_phone: DEMO_PATIENTS[1].phone,
     doctor_name: DEMO_DOCTORS[0].full_name,
   },
   {
@@ -329,6 +331,7 @@ export const DEMO_QUEUE_TICKETS = [
     served_at: null,
     created_at: '2026-11-15T10:45:00Z',
     patient_name: DEMO_PATIENTS[2].full_name,
+    patient_phone: DEMO_PATIENTS[2].phone,
     doctor_name: DEMO_DOCTORS[1].full_name,
   },
 ];

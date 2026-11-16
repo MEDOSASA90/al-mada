@@ -12,21 +12,25 @@ export const dynamic = 'force-dynamic';
 export default async function AppointmentsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ date?: string }>;
+  searchParams: Promise<{ date?: string; doctor_id?: string }>;
 }) {
   const session = await getCurrentSession();
   if (!session) redirect('/login');
 
-  const { date } = await searchParams;
+  const { date, doctor_id } = await searchParams;
   const today = new Date().toISOString().slice(0, 10);
   const selectedDate = date && /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : today;
 
-  const [appointments, patients, doctors, branches] = await Promise.all([
+  const [rawAppointments, patients, doctors, branches] = await Promise.all([
     listAppointmentsForDate(selectedDate),
     listPatients({ limit: 100 }),
     listDoctors(),
     listBranches(),
   ]);
+
+  const appointments = doctor_id
+    ? rawAppointments.filter((a) => a.doctor_id === doctor_id)
+    : rawAppointments;
 
   const stats = {
     total: appointments.length,
@@ -63,23 +67,45 @@ export default async function AppointmentsPage({
         {/* Date Selector & Stats */}
         <section className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-            <form action="/appointments" method="GET" className="flex items-center gap-2">
-              <label htmlFor="date-input" className="text-sm font-medium text-slate-700">تاريخ اليوم:</label>
+            <form action="/appointments" method="GET" className="flex flex-wrap items-center gap-2">
+              <label htmlFor="date-input" className="text-sm font-medium text-slate-700">التاريخ:</label>
               <input
                 id="date-input"
                 type="date"
                 name="date"
                 defaultValue={selectedDate}
-                className="field text-sm py-1.5 px-3"
+                className="field text-sm py-1.5 px-3 w-auto"
               />
+              <label htmlFor="doc-input" className="text-sm font-medium text-slate-700 mr-2">الطبيب:</label>
+              <select
+                id="doc-input"
+                name="doctor_id"
+                defaultValue={doctor_id || ''}
+                className="field text-sm py-1.5 px-3 w-auto"
+              >
+                <option value="">كل الأطباء</option>
+                {doctors.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.full_name}
+                  </option>
+                ))}
+              </select>
               <button type="submit" className="primary-button text-sm py-1.5 px-3">
-                عرض
+                تصفية
               </button>
+              {doctor_id && (
+                <Link
+                  href={`/appointments?date=${selectedDate}`}
+                  className="secondary-button text-xs py-1.5 px-2"
+                >
+                  إلغاء تصفية الطبيب
+                </Link>
+              )}
             </form>
 
             <div className="flex items-center gap-2 text-xs">
               <Link
-                href={`/appointments?date=${today}`}
+                href={`/appointments?date=${today}${doctor_id ? `&doctor_id=${doctor_id}` : ''}`}
                 className={`rounded-lg px-3 py-1.5 font-medium border ${
                   selectedDate === today ? 'bg-teal-800 text-white border-teal-800' : 'bg-slate-50 text-slate-700 border-slate-200'
                 }`}
@@ -87,7 +113,7 @@ export default async function AppointmentsPage({
                 اليوم
               </Link>
               <Link
-                href={`/appointments?date=${getNextDate(today, 1)}`}
+                href={`/appointments?date=${getNextDate(today, 1)}${doctor_id ? `&doctor_id=${doctor_id}` : ''}`}
                 className={`rounded-lg px-3 py-1.5 font-medium border ${
                   selectedDate === getNextDate(today, 1) ? 'bg-teal-800 text-white border-teal-800' : 'bg-slate-50 text-slate-700 border-slate-200'
                 }`}
@@ -188,7 +214,21 @@ export default async function AppointmentsPage({
                     </div>
                   </div>
 
-                  <div className="shrink-0">
+                  <div className="flex flex-wrap items-center gap-2 shrink-0">
+                    {a.patient_phone && (
+                      <a
+                        href={`https://wa.me/${(a.patient_phone.replace(/[^0-9]/g, '').startsWith('0') ? '2' : '') + a.patient_phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
+                          `عزيزنا المريض ${a.patient_name}، نود تذكيركم بموعد كشفكم في عيادة المدى يوم ${a.appointment_date} الساعة ${String(a.appointment_time).slice(0, 5)} مع ${a.doctor_name}. برجاء الحضور قبل الموعد بـ 10 دقائق.`
+                        )}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 rounded-lg border border-emerald-300 bg-emerald-50 px-2.5 py-1.5 text-xs font-semibold text-emerald-800 hover:bg-emerald-100 transition shadow-2xs"
+                        title="إرسال رسالة تذكير بالموعد للمريض عبر واتساب"
+                      >
+                        <span>💬</span>
+                        <span>تذكير واتساب</span>
+                      </a>
+                    )}
                     <AppointmentStatusButtons appointmentId={a.id} currentStatus={a.status} />
                   </div>
                 </div>

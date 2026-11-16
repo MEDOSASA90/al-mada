@@ -70,6 +70,20 @@ export function QueueBoard({ tickets }: { tickets: QueueTicket[] }) {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
+                  {t.patient_phone && (
+                    <a
+                      href={`https://wa.me/${(t.patient_phone.replace(/[^0-9]/g, '').startsWith('0') ? '2' : '') + t.patient_phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
+                        `عزيزنا ${t.patient_name}، تذكرة رقم #${t.ticket_number}. حان دورك الآن للكشف مع ${t.doctor_name || 'الطبيب'} في عيادة المدى. برجاء التوجه لغرفة الكشف.`
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs py-2 px-2.5 rounded-lg transition inline-flex items-center gap-1"
+                      title="إرسال إشعار استدعاء الدور عبر واتساب"
+                    >
+                      <span>💬</span>
+                      <span>تنبيه واتساب</span>
+                    </a>
+                  )}
                   {t.appointment_id && (
                     <Link
                       href={`/clinical/${t.appointment_id}`}
@@ -150,6 +164,20 @@ export function QueueBoard({ tickets }: { tickets: QueueTicket[] }) {
                 </div>
 
                 <div className="flex items-center gap-2">
+                  {t.patient_phone && (
+                    <a
+                      href={`https://wa.me/${(t.patient_phone.replace(/[^0-9]/g, '').startsWith('0') ? '2' : '') + t.patient_phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
+                        `عزيزنا ${t.patient_name}، تذكرة رقم #${t.ticket_number}. حان دورك الآن للكشف مع ${t.doctor_name || 'الطبيب'} في عيادة المدى. برجاء التوجه لغرفة الكشف.`
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rounded-lg border border-emerald-300 bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-800 hover:bg-emerald-100 transition inline-flex items-center gap-1"
+                      title="إرسال تنبيه بالدور للمريض عبر واتساب"
+                    >
+                      <span>💬</span>
+                      <span>واتساب</span>
+                    </a>
+                  )}
                   <button
                     onClick={() => updateStatus(t.id, 'called')}
                     disabled={busyId === t.id}
