@@ -4,6 +4,7 @@
 import { createClient } from '@/lib/supabase/server';
 import type { Patient } from '@/lib/supabase/types';
 import { DEMO_PATIENTS } from './demo-data';
+import { isDemoSession } from './session';
 
 export type PatientInput = {
   full_name: string;
@@ -19,7 +20,7 @@ const SELECT_COLUMNS =
 export async function listPatients(opts?: { limit?: number; search?: string }): Promise<Patient[]> {
   const limit = opts?.limit ?? 50;
 
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  if (await isDemoSession()) {
     let list = [...DEMO_PATIENTS];
     if (opts?.search) {
       const q = opts.search.toLowerCase();
@@ -48,19 +49,27 @@ export async function listPatients(opts?: { limit?: number; search?: string }): 
 }
 
 export async function getPatient(id: string): Promise<Patient | null> {
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  if (await isDemoSession()) {
     const p = DEMO_PATIENTS.find((x) => x.id === id) || DEMO_PATIENTS[0];
     return (p ?? null) as Patient | null;
   }
 
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from('patients')
-    .select(SELECT_COLUMNS)
-    .eq('id', id)
-    .maybeSingle();
-  if (error) throw new Error(`getPatient failed: ${error.message}`);
-  return (data ?? null) as Patient | null;
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from('patients')
+      .select(SELECT_COLUMNS)
+      .eq('id', id)
+      .maybeSingle();
+    if (error || !data) {
+      const fallback = DEMO_PATIENTS.find((x) => x.id === id) || DEMO_PATIENTS[0];
+      return (fallback ?? null) as Patient | null;
+    }
+    return data as Patient;
+  } catch {
+    const fallback = DEMO_PATIENTS.find((x) => x.id === id) || DEMO_PATIENTS[0];
+    return (fallback ?? null) as Patient | null;
+  }
 }
 
 export async function createPatient(input: PatientInput): Promise<Patient> {

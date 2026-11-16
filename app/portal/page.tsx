@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { isDemoSession } from '@/lib/session';
 import { SignOutButton } from '@/app/sign-out-button';
 import { AttachmentLink } from './attachment-link';
 import { PortalLinkRequest } from './link-request';
@@ -21,7 +22,7 @@ type PortalSnapshot = {
 };
 
 export default async function PatientPortalPage() {
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  if (await isDemoSession() || !process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     const demoSnapshot: PortalSnapshot = {
       patients: [
         {

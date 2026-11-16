@@ -10,10 +10,14 @@ export type CurrentSession = {
 };
 
 export async function isDemoSession(): Promise<boolean> {
-  const cookieStore = await cookies();
-  const demoRoleCookie = cookieStore.get('almada_demo_role')?.value;
-  if (demoRoleCookie && ['clinic_owner', 'doctor', 'receptionist', 'accountant'].includes(demoRoleCookie)) {
-    return true;
+  try {
+    const cookieStore = await cookies();
+    const demoRoleCookie = cookieStore.get('almada_demo_role')?.value;
+    if (demoRoleCookie && ['clinic_owner', 'doctor', 'receptionist', 'accountant'].includes(demoRoleCookie)) {
+      return true;
+    }
+  } catch {
+    // Outside of request context (e.g. Jest runner or scripts)
   }
   return !process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 }
@@ -21,8 +25,14 @@ export async function isDemoSession(): Promise<boolean> {
 export async function getCurrentSession(): Promise<CurrentSession | null> {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  const cookieStore = await cookies();
-  const demoRoleCookie = cookieStore.get('almada_demo_role')?.value;
+  let demoRoleCookie: string | undefined;
+
+  try {
+    const cookieStore = await cookies();
+    demoRoleCookie = cookieStore.get('almada_demo_role')?.value;
+  } catch {
+    // Outside of request context
+  }
 
   // 1. Explicit Demo Role Cookie takes immediate precedence (works on Vercel and local)
   if (demoRoleCookie && ['clinic_owner', 'doctor', 'receptionist', 'accountant'].includes(demoRoleCookie)) {

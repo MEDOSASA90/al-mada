@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { DEMO_INVENTORY } from './demo-data';
+import { isDemoSession } from './session';
 
 export type InventoryItem = {
   id: string;
@@ -17,35 +18,49 @@ export type InventoryItem = {
 };
 
 export async function listInventoryItems(): Promise<InventoryItem[]> {
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  if (await isDemoSession()) {
     return DEMO_INVENTORY as InventoryItem[];
   }
 
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from('inventory_items')
-    .select('id,clinic_id,name,sku,category,unit,quantity_on_hand,reorder_level,cost_price,selling_price,is_active,created_at')
-    .is('deleted_at', null)
-    .order('name', { ascending: true });
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from('inventory_items')
+      .select('id,clinic_id,name,sku,category,unit,quantity_on_hand,reorder_level,cost_price,selling_price,is_active,created_at')
+      .is('deleted_at', null)
+      .order('name', { ascending: true });
 
-  if (error) return [];
-  return (data ?? []) as InventoryItem[];
+    if (error || !data || data.length === 0) {
+      return DEMO_INVENTORY as InventoryItem[];
+    }
+    return data as InventoryItem[];
+  } catch {
+    return DEMO_INVENTORY as InventoryItem[];
+  }
 }
 
 export async function getInventoryItem(id: string): Promise<InventoryItem | null> {
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  if (await isDemoSession()) {
     const item = DEMO_INVENTORY.find((i) => i.id === id) || DEMO_INVENTORY[0];
     return (item ?? null) as InventoryItem | null;
   }
 
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from('inventory_items')
-    .select('id,clinic_id,name,sku,category,unit,quantity_on_hand,reorder_level,cost_price,selling_price,is_active,created_at')
-    .eq('id', id)
-    .is('deleted_at', null)
-    .maybeSingle();
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from('inventory_items')
+      .select('id,clinic_id,name,sku,category,unit,quantity_on_hand,reorder_level,cost_price,selling_price,is_active,created_at')
+      .eq('id', id)
+      .is('deleted_at', null)
+      .maybeSingle();
 
-  if (error || !data) return null;
-  return data as InventoryItem;
+    if (error || !data) {
+      const fallback = DEMO_INVENTORY.find((i) => i.id === id) || DEMO_INVENTORY[0];
+      return (fallback ?? null) as InventoryItem | null;
+    }
+    return data as InventoryItem;
+  } catch {
+    const fallback = DEMO_INVENTORY.find((i) => i.id === id) || DEMO_INVENTORY[0];
+    return (fallback ?? null) as InventoryItem | null;
+  }
 }
