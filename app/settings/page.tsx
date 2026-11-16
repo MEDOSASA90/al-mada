@@ -14,6 +14,22 @@ export default async function SettingsHubPage() {
 
   const settingsCards = [
     {
+      title: 'إطلاق الميزات والتحكم في التوسع (Feature Flags)',
+      description: 'إدارة تشغيل وإيقاف الميزات التخصصية وسوق المستلزمات والتحكم في الإطلاق التدريجي.',
+      icon: '🎛️',
+      href: '/settings/feature-flags',
+      badge: 'المرحلة 8',
+      ownerOnly: true,
+    },
+    {
+      title: 'الحزم والقوالب التخصصية (Specialty Packs)',
+      description: 'حاسبات النساء والتوليد وحساب الحمل EDD، جدول تطعيمات الأطفال المصري، وضوابط جلسات الليزر.',
+      icon: '🩺',
+      href: '/settings/specialties',
+      badge: 'المرحلة 8',
+      ownerOnly: false,
+    },
+    {
       title: 'صحة النظام وجاهزية الإطلاق التشغيلي',
       description: 'فحص تشخيصي فوري لقاعدة البيانات، سياسات عزل المستأجرين، زمن الاستجابة، والامتثال لقانون 151.',
       icon: '🛡️',
