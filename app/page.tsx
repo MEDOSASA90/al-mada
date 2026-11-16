@@ -79,6 +79,15 @@ export default async function Home() {
             <Link href="/portal" className="secondary-button inline-flex items-center text-sm">
               بوابة المريض
             </Link>
+            {['clinic_owner', 'clinic_admin'].includes(membership.role) && (
+              <Link
+                href="/settings"
+                className="secondary-button inline-flex items-center gap-1.5 text-sm font-semibold text-teal-950 bg-teal-50/80 border-teal-300 hover:bg-teal-100"
+              >
+                <span>⚙️</span>
+                <span>مركز الإعدادات</span>
+              </Link>
+            )}
             {['clinic_owner', 'clinic_admin', 'receptionist'].includes(membership.role) && (
               <Link href="/settings/patient-links" className="secondary-button inline-flex items-center text-sm">
                 طلبات ربط المرضى
@@ -148,6 +157,16 @@ export default async function Home() {
               {isDoctor && !isOwner ? 'كشف حساب مستحقاتك' : 'فواتير ومصروفات والوردية'}
             </span>
           </Link>
+          {isDoctor && (
+            <Link
+              href="/clinical"
+              className="flex-1 min-w-[130px] rounded-xl bg-teal-50 hover:bg-teal-100 border border-teal-200 hover:border-teal-300 p-3 text-center transition group"
+            >
+              <span className="block text-xl mb-1">🩺</span>
+              <span className="block text-sm font-bold text-teal-950 group-hover:text-teal-900">العيادة الطبية</span>
+              <span className="block text-[11px] text-teal-700">كشوفات وروشتات اليوم</span>
+            </Link>
+          )}
           {(!isDoctor || isOwner) && (
             <>
               <Link
@@ -165,6 +184,14 @@ export default async function Home() {
                 <span className="block text-xl mb-1">📦</span>
                 <span className="block text-sm font-bold text-slate-800 group-hover:text-teal-900">المخزون الطبي</span>
                 <span className="block text-[11px] text-slate-500">مستلزمات وعهد العيادة</span>
+              </Link>
+              <Link
+                href="/settings"
+                className="flex-1 min-w-[130px] rounded-xl bg-slate-50 hover:bg-teal-50 border border-slate-200 hover:border-teal-300 p-3 text-center transition group"
+              >
+                <span className="block text-xl mb-1">⚙️</span>
+                <span className="block text-sm font-bold text-slate-800 group-hover:text-teal-900">إعدادات النظام</span>
+                <span className="block text-[11px] text-slate-500">الفروع والطاقم والنسخ</span>
               </Link>
             </>
           )}
