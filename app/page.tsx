@@ -95,6 +95,12 @@ export default async function Home() {
             )}
             {['clinic_owner', 'clinic_admin'].includes(membership.role) && (
               <>
+                <Link
+                  href="/settings/ai"
+                  className="secondary-button inline-flex items-center text-sm font-semibold text-teal-950 bg-teal-50 border-teal-300 hover:bg-teal-100"
+                >
+                  🤖 الذكاء الاصطناعي
+                </Link>
                 <Link href="/settings/staff" className="secondary-button inline-flex items-center text-sm">
                   👥 الطاقم
                 </Link>

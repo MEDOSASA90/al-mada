@@ -4,6 +4,8 @@ import { useActionState, useState } from 'react';
 import Link from 'next/link';
 import { saveConsultationAction, lockConsultationAction, type ClinicalFormState } from './actions';
 import type { MedicalRecord } from '@/lib/medical-records';
+import { AIClinicalScribe } from './ai-clinical-scribe';
+import type { ClinicalAIDraft } from '@/lib/ai';
 
 const initialState: ClinicalFormState = { message: '', success: false };
 
@@ -27,14 +29,39 @@ export function ConsultationForm({
   const [state, formAction, isPending] = useActionState(saveConsultationAction, initialState);
   const [locking, setLocking] = useState(false);
   const [lockMsg, setLockMsg] = useState('');
-  const [treatmentPlan, setTreatmentPlan] = useState(existingRecord?.treatment_plan || '');
-
+  
   const isLocked = existingRecord?.is_locked ?? false;
   const vitals = existingRecord?.vitals ?? {};
+
+  // Form Field States (Supports AI Scribe auto-fill)
+  const [chiefComplaint, setChiefComplaint] = useState(existingRecord?.chief_complaint || '');
+  const [diagnosis, setDiagnosis] = useState(existingRecord?.diagnosis || '');
+  const [treatmentPlan, setTreatmentPlan] = useState(existingRecord?.treatment_plan || '');
+  const [notes, setNotes] = useState(existingRecord?.notes || '');
+  const [vitalsBp, setVitalsBp] = useState(vitals.blood_pressure || '');
+  const [vitalsHr, setVitalsHr] = useState(vitals.heart_rate || '');
+  const [vitalsTemp, setVitalsTemp] = useState(vitals.temperature || '');
+  const [vitalsWeight, setVitalsWeight] = useState(vitals.weight || '');
 
   function appendPreset(presetText: string) {
     if (isLocked) return;
     setTreatmentPlan((prev) => (prev ? `${prev.trim()}\n• ${presetText}` : `• ${presetText}`));
+  }
+
+  function handleApplyDraft(draft: ClinicalAIDraft) {
+    if (draft.chiefComplaint) setChiefComplaint(draft.chiefComplaint);
+    if (draft.provisionalDiagnosis) setDiagnosis(draft.provisionalDiagnosis);
+    if (draft.treatmentPlan) setTreatmentPlan(draft.treatmentPlan);
+    if (draft.patientAdvice || draft.followUp) {
+      setNotes((prev) =>
+        prev
+          ? `${prev}\nنصائح: ${draft.patientAdvice} — إعادة الكشف: ${draft.followUp}`
+          : `نصائح: ${draft.patientAdvice} — إعادة الكشف: ${draft.followUp}`
+      );
+    }
+    if (draft.vitals.bp) setVitalsBp(draft.vitals.bp);
+    if (draft.vitals.hr) setVitalsHr(draft.vitals.hr);
+    if (draft.vitals.temp) setVitalsTemp(draft.vitals.temp);
   }
 
   async function handleLock() {
@@ -91,6 +118,15 @@ export function ConsultationForm({
         </div>
       )}
 
+      {/* AI Clinical Scribe & History Copilot (Phase 6) */}
+      <AIClinicalScribe
+        appointmentId={appointmentId}
+        patientId={patientId}
+        doctorName={doctorName}
+        isLocked={isLocked}
+        onApplyDraft={handleApplyDraft}
+      />
+
       <form action={formAction} className="space-y-6">
         <input type="hidden" name="patient_id" value={patientId} />
         <input type="hidden" name="doctor_id" value={doctorId} />
@@ -109,10 +145,11 @@ export function ConsultationForm({
               <label className="block text-xs font-medium text-slate-600">ضغط الدم (BP)</label>
               <input
                 name="vitals_bp"
-                defaultValue={vitals.blood_pressure || ''}
+                value={vitalsBp}
+                onChange={(e) => setVitalsBp(e.target.value)}
                 disabled={isLocked}
                 placeholder="120/80"
-                className="field mt-1 text-sm text-left"
+                className="field mt-1 text-sm text-left font-mono"
                 dir="ltr"
               />
             </div>
@@ -120,10 +157,11 @@ export function ConsultationForm({
               <label className="block text-xs font-medium text-slate-600">النبض (HR)</label>
               <input
                 name="vitals_hr"
-                defaultValue={vitals.heart_rate || ''}
+                value={vitalsHr}
+                onChange={(e) => setVitalsHr(e.target.value)}
                 disabled={isLocked}
                 placeholder="75 bpm"
-                className="field mt-1 text-sm text-left"
+                className="field mt-1 text-sm text-left font-mono"
                 dir="ltr"
               />
             </div>
@@ -131,10 +169,11 @@ export function ConsultationForm({
               <label className="block text-xs font-medium text-slate-600">الحرارة (°C)</label>
               <input
                 name="vitals_temp"
-                defaultValue={vitals.temperature || ''}
+                value={vitalsTemp}
+                onChange={(e) => setVitalsTemp(e.target.value)}
                 disabled={isLocked}
                 placeholder="37.0"
-                className="field mt-1 text-sm text-left"
+                className="field mt-1 text-sm text-left font-mono"
                 dir="ltr"
               />
             </div>
@@ -142,10 +181,11 @@ export function ConsultationForm({
               <label className="block text-xs font-medium text-slate-600">الوزن (كجم)</label>
               <input
                 name="vitals_weight"
-                defaultValue={vitals.weight || ''}
+                value={vitalsWeight}
+                onChange={(e) => setVitalsWeight(e.target.value)}
                 disabled={isLocked}
                 placeholder="70"
-                className="field mt-1 text-sm text-left"
+                className="field mt-1 text-sm text-left font-mono"
                 dir="ltr"
               />
             </div>
@@ -156,7 +196,7 @@ export function ConsultationForm({
                 defaultValue={vitals.height || ''}
                 disabled={isLocked}
                 placeholder="175"
-                className="field mt-1 text-sm text-left"
+                className="field mt-1 text-sm text-left font-mono"
                 dir="ltr"
               />
             </div>
@@ -174,7 +214,8 @@ export function ConsultationForm({
             <label className="block text-sm font-medium text-slate-700">الشكوى الرئيسية وتاريخ المرض الحالي</label>
             <textarea
               name="chief_complaint"
-              defaultValue={existingRecord?.chief_complaint || ''}
+              value={chiefComplaint}
+              onChange={(e) => setChiefComplaint(e.target.value)}
               disabled={isLocked}
               rows={3}
               placeholder="وصف شكوى المريض، الأعراض، وبدايتها…"
@@ -186,7 +227,8 @@ export function ConsultationForm({
             <label className="block text-sm font-medium text-slate-700">التشخيص الطبي (Diagnosis)</label>
             <input
               name="diagnosis"
-              defaultValue={existingRecord?.diagnosis || ''}
+              value={diagnosis}
+              onChange={(e) => setDiagnosis(e.target.value)}
               disabled={isLocked}
               placeholder="التشخيص الأولي أو النهائي (مثال: نزلة معوية حادة، التهاب شعبي…)"
               className="field mt-1 w-full font-medium"
@@ -278,7 +320,8 @@ export function ConsultationForm({
             <label className="block text-sm font-medium text-slate-700">ملاحظات داخلية / توصيات المتابعة</label>
             <textarea
               name="notes"
-              defaultValue={existingRecord?.notes || ''}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
               disabled={isLocked}
               rows={2}
               placeholder="توصيات بالفحوصات المطلوبة، موعد الاستشارة القادمة…"

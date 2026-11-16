@@ -14,6 +14,14 @@ export default async function SettingsHubPage() {
 
   const settingsCards = [
     {
+      title: 'منظومة الذكاء الاصطناعي والمساعد التنفيذي',
+      description: 'ضبط نماذج الذكاء الاصطناعي، الاستعلام باللغة الطبيعية عن أداء العيادة، ومراقبة استهلاك الرموز.',
+      icon: '🤖',
+      href: '/settings/ai',
+      badge: 'المرحلة 6',
+      ownerOnly: true,
+    },
+    {
       title: 'إدارة الطاقم الطبي والإداري',
       description: 'إضافة وتعديل الأطباء، التمريض، موظفي الاستقبال، نسب أتعاب الأطباء والصلاحيات.',
       icon: '👥',
