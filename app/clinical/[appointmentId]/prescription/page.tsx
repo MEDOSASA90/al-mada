@@ -52,6 +52,10 @@ export default async function ElectronicPrescriptionPage({
         },
       ];
 
+  const isSara = (appointment.doctor_name && appointment.doctor_name.includes('سارة')) || appointment.doctor_id === '11111111-1111-1111-1111-111111111112';
+  const doctorTitle = isSara ? 'أخصائية الأمراض الجلدية والتجميل والليزر' : 'استشاري الباطنة والسكر والجهاز الهضمي';
+  const licenseNumber = isSara ? '41209/2021' : '34892/2018';
+
   return (
     <main className="min-h-screen bg-slate-100 p-4 sm:p-8" dir="rtl">
       <div className="mx-auto max-w-4xl space-y-6">
@@ -59,8 +63,8 @@ export default async function ElectronicPrescriptionPage({
           appointmentId={appointment.id}
           clinicName={clinic?.name_ar || clinic?.name || 'عيادة المدى التخصصية'}
           doctorName={appointment.doctor_name || 'د. أحمد مصطفى شريف'}
-          doctorTitle="استشاري الباطنة والجهاز الهضمي"
-          licenseNumber="34892/2018"
+          doctorTitle={doctorTitle}
+          licenseNumber={licenseNumber}
           patientName={appointment.patient_name || patient?.full_name || 'مريض'}
           patientFileNumber={appointment.patient_file_number || patient?.file_number || '000101'}
           patientPhone={patient?.phone || appointment.patient_phone || ''}

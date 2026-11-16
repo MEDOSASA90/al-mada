@@ -18,7 +18,10 @@ export default async function ClinicalHubPage() {
   }
 
   const today = new Date().toISOString().slice(0, 10);
-  const appointments = await listAppointmentsForDate(today);
+  const rawAppointments = await listAppointmentsForDate(today);
+  const appointments = isDoctor && !isOwner
+    ? rawAppointments.filter((a) => a.doctor_id === session.user.id)
+    : rawAppointments;
 
   return (
     <main className="min-h-screen bg-slate-50 p-4 sm:p-8" dir="rtl">
