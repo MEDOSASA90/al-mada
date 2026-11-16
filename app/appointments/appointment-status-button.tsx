@@ -3,13 +3,23 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { changeAppointmentStatusAction, issueQueueTicketAction } from './actions';
+import { AppointmentRescheduleDialog } from './appointment-reschedule-dialog';
 
 type Props = {
   appointmentId: string;
   currentStatus: string;
+  appointmentDate?: string;
+  appointmentTime?: string;
+  patientName?: string;
 };
 
-export function AppointmentStatusButtons({ appointmentId, currentStatus }: Props) {
+export function AppointmentStatusButtons({
+  appointmentId,
+  currentStatus,
+  appointmentDate = new Date().toISOString().slice(0, 10),
+  appointmentTime = '10:00',
+  patientName = 'المريض',
+}: Props) {
   const [busy, setBusy] = useState(false);
   const [cancelOpen, setCancelOpen] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
@@ -41,6 +51,16 @@ export function AppointmentStatusButtons({ appointmentId, currentStatus }: Props
 
   return (
     <div className="flex flex-wrap items-center gap-2">
+      {/* Reschedule Dialog */}
+      {['booked', 'confirmed'].includes(currentStatus) && (
+        <AppointmentRescheduleDialog
+          appointmentId={appointmentId}
+          currentDate={appointmentDate}
+          currentTime={appointmentTime}
+          patientName={patientName}
+        />
+      )}
+
       {/* If booked, allow confirm or issue queue ticket */}
       {currentStatus === 'booked' && (
         <button

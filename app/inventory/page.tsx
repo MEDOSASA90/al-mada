@@ -4,6 +4,7 @@ import { getCurrentSession } from '@/lib/session';
 import { listInventoryItems } from '@/lib/inventory';
 import { InventoryItemForm } from './item-form';
 import { MovementDialog } from './movement-dialog';
+import { ItemEditDialog } from './item-edit-dialog';
 
 export const dynamic = 'force-dynamic';
 
@@ -168,6 +169,7 @@ export default async function InventoryPage({
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2">
+                      <ItemEditDialog item={it} />
                       {isLow && (
                         <a
                           href={`https://wa.me/?text=${reorderMsg}`}

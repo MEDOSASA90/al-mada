@@ -229,7 +229,13 @@ export default async function AppointmentsPage({
                         <span>تذكير واتساب</span>
                       </a>
                     )}
-                    <AppointmentStatusButtons appointmentId={a.id} currentStatus={a.status} />
+                    <AppointmentStatusButtons
+                      appointmentId={a.id}
+                      currentStatus={a.status}
+                      appointmentDate={a.appointment_date}
+                      appointmentTime={a.appointment_time}
+                      patientName={a.patient_name ?? 'المريض'}
+                    />
                   </div>
                 </div>
               ))}

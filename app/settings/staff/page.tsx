@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getCurrentSession } from '@/lib/session';
 import { listStaff } from '@/lib/staff';
+import { StaffEditDialog } from './staff-edit-dialog';
 
 export const dynamic = 'force-dynamic';
 
@@ -105,20 +106,21 @@ export default async function StaffSettingsPage() {
                         </span>
                       </td>
                       <td className="p-3.5 text-center">
-                        {waPhone ? (
-                          <a
-                            href={`https://wa.me/${waPhone}?text=${encodeURIComponent(`مرحباً زميلنا العزيز ${m.full_name}، نتواصل معك من إدارة عيادة المدى.`)}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 rounded-lg border border-emerald-300 bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-800 hover:bg-emerald-100 transition shadow-2xs"
-                            title="مراسلة سريعة عبر واتساب"
-                          >
-                            <span>💬</span>
-                            <span>واتساب</span>
-                          </a>
-                        ) : (
-                          <span className="text-slate-400">—</span>
-                        )}
+                        <div className="flex items-center justify-center gap-1.5">
+                          <StaffEditDialog member={m} />
+                          {waPhone && (
+                            <a
+                              href={`https://wa.me/${waPhone}?text=${encodeURIComponent(`مرحباً زميلنا العزيز ${m.full_name}، نتواصل معك من إدارة عيادة المدى.`)}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 rounded-lg border border-emerald-300 bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-800 hover:bg-emerald-100 transition shadow-2xs"
+                              title="مراسلة سريعة عبر واتساب"
+                            >
+                              <span>💬</span>
+                              <span>واتساب</span>
+                            </a>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   );
