@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
+import { isDemoSession } from '@/lib/session';
 
 export type PackageFormState = { message: string; success: boolean };
 
@@ -24,7 +25,8 @@ export async function createPackageAction(
     return { message: 'راجع بيانات الباقة المدخلة (الاسم وعدد الجلسات مطلوبان).', success: false };
   }
 
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  const isDemo = await isDemoSession();
+  if (isDemo) {
     revalidatePath('/packages');
     return { message: 'تم اشتراك المريض في باقة الجلسات بنجاح (وضع المعاينة التجريبي).', success: true };
   }
@@ -56,7 +58,8 @@ export async function consumeSessionAction(packageId: string): Promise<PackageFo
     return { message: 'معرّف الباقة غير صالح.', success: false };
   }
 
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  const isDemo = await isDemoSession();
+  if (isDemo) {
     revalidatePath('/packages');
     return { message: 'تم تسجيل استخدام الجلسة بنجاح (المتبقي: 3 جلسات) (وضع المعاينة التجريبي).', success: true };
   }

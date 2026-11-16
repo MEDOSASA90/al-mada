@@ -16,6 +16,7 @@ export type PatientPackage = {
   is_active: boolean;
   notes: string | null;
   patient_name?: string;
+  patient_phone?: string;
   created_at: string;
 };
 
@@ -56,12 +57,16 @@ export async function listAllClinicPackages(): Promise<PatientPackage[]> {
 
   const patientIds = Array.from(new Set(pkgs.map((p) => p.patient_id).filter(Boolean)));
   if (patientIds.length > 0) {
-    const { data: patients } = await supabase.from('patients').select('id,full_name').in('id', patientIds);
-    const pMap = new Map((patients ?? []).map((p) => [p.id, p.full_name]));
-    return pkgs.map((p) => ({
-      ...p,
-      patient_name: pMap.get(p.patient_id) ?? 'مريض',
-    }));
+    const { data: patients } = await supabase.from('patients').select('id,full_name,phone').in('id', patientIds);
+    const pMap = new Map((patients ?? []).map((p) => [p.id, p]));
+    return pkgs.map((p) => {
+      const pat = pMap.get(p.patient_id);
+      return {
+        ...p,
+        patient_name: pat?.full_name ?? 'مريض',
+        patient_phone: pat?.phone,
+      };
+    });
   }
 
   return pkgs;

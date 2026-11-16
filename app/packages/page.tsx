@@ -119,7 +119,21 @@ export default async function PackagesPage() {
                       </div>
                     </div>
 
-                    <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      {pkg.patient_phone && remaining > 0 && (
+                        <a
+                          href={`https://wa.me/${(pkg.patient_phone.replace(/[^0-9]/g, '').startsWith('0') ? '2' : '') + pkg.patient_phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
+                            `عزيزنا ${pkg.patient_name}، نود تذكيرك بأن لديك ${remaining} جلسة متبقية في ${pkg.name} بعيادة المدى. يسعدنا استقبالك لحجز وتنسيق جلستك القادمة.`
+                          )}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 rounded-xl border border-emerald-300 bg-emerald-50 px-2.5 py-1.5 text-xs font-semibold text-emerald-800 hover:bg-emerald-100 transition shadow-2xs"
+                          title="إرسال تذكير بالجلسة المتبقية عبر واتساب"
+                        >
+                          <span>💬</span>
+                          <span>تذكير واتساب</span>
+                        </a>
+                      )}
                       <SessionConsumeButton
                         packageId={pkg.id}
                         remaining={remaining}

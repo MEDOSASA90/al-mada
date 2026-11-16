@@ -396,6 +396,7 @@ export const DEMO_PACKAGES = [
     is_active: true,
     notes: 'تشمل الفحص وقياس السكر التراكمي ومتابعة العلاج',
     patient_name: DEMO_PATIENTS[0].full_name,
+    patient_phone: DEMO_PATIENTS[0].phone,
     created_at: '2026-11-01T10:00:00Z',
   },
   {
@@ -413,6 +414,7 @@ export const DEMO_PACKAGES = [
     is_active: true,
     notes: 'جلسات مكثفة للفقرات القطنية',
     patient_name: DEMO_PATIENTS[1].full_name,
+    patient_phone: DEMO_PATIENTS[1].phone,
     created_at: '2026-11-05T12:00:00Z',
   },
 ];

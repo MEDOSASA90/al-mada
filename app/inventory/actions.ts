@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
+import { isDemoSession } from '@/lib/session';
 
 export type InventoryFormState = { message: string; success: boolean };
 
@@ -26,7 +27,8 @@ export async function createInventoryItemAction(
     return { message: 'اسم الصنف أو المستلزم الطبي مطلوب.', success: false };
   }
 
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  const isDemo = await isDemoSession();
+  if (isDemo) {
     revalidatePath('/inventory');
     return { message: 'تمت إضافة الصنف إلى المخزون بنجاح (وضع المعاينة التجريبي).', success: true };
   }
@@ -41,7 +43,7 @@ export async function createInventoryItemAction(
     .limit(1)
     .maybeSingle();
 
-  if (!membership || !['clinic_owner', 'clinic_admin', 'inventory_manager'].includes(membership.role)) {
+  if (!membership || !['clinic_owner', 'clinic_admin', 'inventory_manager', 'receptionist', 'nurse', 'doctor'].includes(membership.role)) {
     return { message: 'لا تملك صلاحية إدارة المخزون.', success: false };
   }
 
@@ -77,7 +79,8 @@ export async function recordMovementAction(
     return { ok: false, message: 'بيانات الحركة غير صالحة.' };
   }
 
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  const isDemo = await isDemoSession();
+  if (isDemo) {
     revalidatePath('/inventory');
     return { ok: true, message: 'تم تحديث الرصيد بنجاح (وضع المعاينة التجريبي).' };
   }
@@ -99,5 +102,5 @@ export async function recordMovementAction(
   }
 
   revalidatePath('/inventory');
-  return { ok: true, message: `تم تحديث الرصيد بنجاح (الرصيد الجديد: ${newQty}).` };
+  return { ok: true, message: `تم تسجيل حركة المخزون بنجاح (الرصيد الجديد: ${newQty}).` };
 }
