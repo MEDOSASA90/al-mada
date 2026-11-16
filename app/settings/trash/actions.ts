@@ -2,13 +2,15 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
+import { isDemoSession } from '@/lib/session';
 
 export async function restoreTrashItemAction(itemId: string, itemType: string) {
   if (!/^[0-9a-f-]{36}$/i.test(itemId)) {
     return { ok: false, message: 'معرّف السجل غير صالح.' };
   }
 
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  const isDemo = await isDemoSession();
+  if (isDemo) {
     revalidatePath('/settings/trash');
     revalidatePath('/patients');
     return { ok: true, message: 'تمت استعادة السجل وإعادته إلى قائمة السجلات النشطة (وضع المعاينة التجريبي).' };

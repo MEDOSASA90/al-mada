@@ -66,41 +66,63 @@ export default async function StaffSettingsPage() {
                   <th className="p-3.5 text-center">نسبة الطبيب</th>
                   <th className="p-3.5 text-center">سعر الكشف</th>
                   <th className="p-3.5 text-center">الحالة</th>
+                  <th className="p-3.5 text-center">تواصل سريع</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {staff.map((m) => (
-                  <tr key={m.id} className="hover:bg-slate-50/60 transition">
-                    <td className="p-3.5 font-bold text-slate-900 text-sm">
-                      {m.full_name}
-                    </td>
-                    <td className="p-3.5">
-                      <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold ${roleBadge(m.role)}`}>
-                        {roleLabel(m.role)}
-                      </span>
-                    </td>
-                    <td className="p-3.5 text-slate-600">
-                      <p className="font-mono">{m.phone || '—'}</p>
-                      <p className="text-[11px] text-slate-400 font-mono">{m.email || '—'}</p>
-                    </td>
-                    <td className="p-3.5 font-mono text-slate-700">
-                      {m.license_number || '—'}
-                    </td>
-                    <td className="p-3.5 text-center font-bold text-teal-800">
-                      {m.role === 'doctor' || m.role === 'visiting_doctor' ? `%${m.commission_percentage ?? 70}` : '—'}
-                    </td>
-                    <td className="p-3.5 text-center font-mono font-bold text-slate-800">
-                      {m.consultation_fee ? `${m.consultation_fee} ج.م` : '—'}
-                    </td>
-                    <td className="p-3.5 text-center">
-                      <span className={`inline-block rounded-full px-2 py-0.5 text-[11px] font-bold ${
-                        m.is_active ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-rose-50 text-rose-800 border border-rose-200'
-                      }`}>
-                        {m.is_active ? 'نشط' : 'معطل'}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
+                {staff.map((m) => {
+                  const cleanPhone = m.phone ? m.phone.replace(/[^0-9]/g, '') : '';
+                  const waPhone = cleanPhone.startsWith('0') ? '2' + cleanPhone : cleanPhone;
+
+                  return (
+                    <tr key={m.id} className="hover:bg-slate-50/60 transition">
+                      <td className="p-3.5 font-bold text-slate-900 text-sm">
+                        {m.full_name}
+                      </td>
+                      <td className="p-3.5">
+                        <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold ${roleBadge(m.role)}`}>
+                          {roleLabel(m.role)}
+                        </span>
+                      </td>
+                      <td className="p-3.5 text-slate-600">
+                        <p className="font-mono">{m.phone || '—'}</p>
+                        <p className="text-[11px] text-slate-400 font-mono">{m.email || '—'}</p>
+                      </td>
+                      <td className="p-3.5 font-mono text-slate-700">
+                        {m.license_number || '—'}
+                      </td>
+                      <td className="p-3.5 text-center font-bold text-teal-800">
+                        {m.role === 'doctor' || m.role === 'visiting_doctor' ? `%${m.commission_percentage ?? 70}` : '—'}
+                      </td>
+                      <td className="p-3.5 text-center font-mono font-bold text-slate-800">
+                        {m.consultation_fee ? `${m.consultation_fee} ج.م` : '—'}
+                      </td>
+                      <td className="p-3.5 text-center">
+                        <span className={`inline-block rounded-full px-2 py-0.5 text-[11px] font-bold ${
+                          m.is_active ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-rose-50 text-rose-800 border border-rose-200'
+                        }`}>
+                          {m.is_active ? 'نشط' : 'معطل'}
+                        </span>
+                      </td>
+                      <td className="p-3.5 text-center">
+                        {waPhone ? (
+                          <a
+                            href={`https://wa.me/${waPhone}?text=${encodeURIComponent(`مرحباً زميلنا العزيز ${m.full_name}، نتواصل معك من إدارة عيادة المدى.`)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 rounded-lg border border-emerald-300 bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-800 hover:bg-emerald-100 transition shadow-2xs"
+                            title="مراسلة سريعة عبر واتساب"
+                          >
+                            <span>💬</span>
+                            <span>واتساب</span>
+                          </a>
+                        ) : (
+                          <span className="text-slate-400">—</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

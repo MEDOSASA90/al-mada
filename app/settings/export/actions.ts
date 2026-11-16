@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
+import { isDemoSession } from '@/lib/session';
 
 export type ExportFormState = { message: string; success: boolean; downloadJson?: string };
 
@@ -11,7 +12,8 @@ export async function requestExportAction(
 ): Promise<ExportFormState> {
   const exportType = String(formData.get('export_type') ?? 'full_backup');
 
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  const isDemo = await isDemoSession();
+  if (isDemo) {
     revalidatePath('/settings/export');
     return {
       message: 'تم تجهيز حزمة التصدير بنجاح وجاهزة للتحميل الفوري (وضع المعاينة).',
