@@ -391,6 +391,32 @@ export default async function PatientPortalPage() {
             ))}
           </ul>
         )}
+
+        <div className="mt-4 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 bg-teal-50/70 p-3.5 rounded-xl border border-teal-200">
+          <div className="flex items-center gap-2">
+            <span className="text-xl">🔬</span>
+            <div>
+              <p className="text-xs font-bold text-teal-950">فحص معملي حديث معتمد متوفر بملفك (رقم LAB-2026-0981)</p>
+              <p className="text-[11px] text-teal-800">
+                صورة دم كاملة CBC + سكر تراكمي HbA1c + وظائف كلى KFT معتمدة رسمياً وموثقة بكود QR لمنع التزوير.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/lab/orders/order-101/report"
+              className="rounded-lg bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs px-3 py-1.5 transition shadow-xs"
+            >
+              عرض التقرير بـ QR
+            </Link>
+            <Link
+              href="/lab/orders/new"
+              className="rounded-lg bg-white border border-teal-300 hover:bg-teal-100 text-teal-900 font-bold text-xs px-3 py-1.5 transition"
+            >
+              طلب سحب منزلي 🏠
+            </Link>
+          </div>
+        </div>
       </section>
 
       {/* 4. Smart Care Discovery: Recommended Doctors for Your Condition */}

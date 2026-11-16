@@ -173,6 +173,14 @@ export default async function Home() {
               <span className="block text-[11px] text-teal-700">كشوفات وروشتات اليوم</span>
             </Link>
           )}
+          <Link
+            href="/lab"
+            className="flex-1 min-w-[130px] rounded-xl bg-teal-50 hover:bg-teal-100 border border-teal-200 hover:border-teal-300 p-3 text-center transition group"
+          >
+            <span className="block text-xl mb-1">🔬</span>
+            <span className="block text-sm font-bold text-teal-950 group-hover:text-teal-900">معمل التحاليل</span>
+            <span className="block text-[11px] text-teal-700">عينات ونتائج وباركود</span>
+          </Link>
           {(!isDoctor || isOwner) && (
             <>
               <Link
